@@ -117,6 +117,7 @@ public class AnimationsLocation implements Serializable {
 
     public void save(String key, ConfigurationSection config) {
         ConfigurationSection section = config.createSection(key);
+        section.set("World", worldId.toString());
         section.set("X",x);
         section.set("Y",y);
         section.set("Z",z);
@@ -125,7 +126,7 @@ public class AnimationsLocation implements Serializable {
     public static AnimationsLocation load(String key, ConfigurationSection config) {
         ConfigurationSection section = config.getConfigurationSection(key);
         if(section != null) {
-            return new AnimationsLocation(Bukkit.getWorlds().get(0),
+            return new AnimationsLocation(Bukkit.getWorld(UUID.fromString(section.getString("World", "0"))),
                     section.getDouble("X"),
                     section.getDouble("Y"),
                     section.getDouble("Z"));
