@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +33,11 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class TypeCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     private final EditAnimationConversationPrompt affectedPrompt;
-    
+
     public TypeCommandHandler(Prompt successPrompt, EditAnimationConversationPrompt affectedPrompt) {
         super("type", 1, 0, false, "m(oving)|s(tationary)");
         this.successPrompt = successPrompt;
@@ -45,10 +45,11 @@ public class TypeCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         AnimationType type = AnimationType.fromString(params[1]);
         affectedPrompt.setType(type);
-        return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TYPE_SET, type.getName()));
+        return new ConversationResponsePrompt(
+                successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TYPE_SET, type.getName()));
     }
-    
 }

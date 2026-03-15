@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -23,9 +23,10 @@ package com.ivan1pl.animations.triggers;
  * @author Ivan1pl
  */
 public interface Trigger {
-    
+
     void execute();
+
     void register();
+
     void unregister();
-    
 }

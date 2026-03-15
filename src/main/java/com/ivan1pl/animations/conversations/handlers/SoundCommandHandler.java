@@ -39,7 +39,8 @@ public class SoundCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         int range = Integer.parseUnsignedInt(params[1]);
         int pitch = Integer.parseUnsignedInt(params[2]);
         int volume = Integer.parseUnsignedInt(params[3]);
@@ -49,5 +50,4 @@ public class SoundCommandHandler extends ConversationCommandHandler {
         sd.setVolume(volume);
         return new SelectSoundConversationPrompt(successPrompt, animation, sd);
     }
-
 }

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -23,37 +23,36 @@ package com.ivan1pl.animations.utils;
  * @author Ivan1pl
  */
 public class StringUtil {
-    
+
     public static boolean isInteger(String s) {
-        return isInteger(s,10);
+        return isInteger(s, 10);
     }
 
     public static boolean isInteger(String s, int radix) {
         return isInteger(s, radix, false);
     }
-    
+
     private static boolean isInteger(String s, int radix, boolean unsigned) {
-        if(isEmpty(s)) return false;
-        for(int i = 0; i < s.length(); i++) {
-            if(i == 0 && s.charAt(i) == '-' && !unsigned) {
-                if(s.length() == 1) return false;
+        if (isEmpty(s)) return false;
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 && s.charAt(i) == '-' && !unsigned) {
+                if (s.length() == 1) return false;
                 else continue;
             }
-            if(Character.digit(s.charAt(i),radix) < 0) return false;
+            if (Character.digit(s.charAt(i), radix) < 0) return false;
         }
         return true;
     }
-    
+
     public static boolean isUnsignedInteger(String s, int radix) {
         return isInteger(s, radix, true);
     }
-    
+
     public static boolean isUnsignedInteger(String s) {
         return isUnsignedInteger(s, 10);
     }
-    
+
     public static boolean isEmpty(String s) {
         return s == null || s.isEmpty();
     }
-    
 }

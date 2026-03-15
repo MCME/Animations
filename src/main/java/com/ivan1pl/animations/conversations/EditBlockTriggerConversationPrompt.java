@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,13 +35,13 @@ import org.bukkit.entity.Player;
  * @author Ivan1pl
  */
 public class EditBlockTriggerConversationPrompt extends BaseEditorFixedSetPrompt {
-    
+
     private final Prompt retPrompt;
-    
+
     private final Animation animation;
-    
+
     private final TriggerBuilder triggerBuilder;
-    
+
     public EditBlockTriggerConversationPrompt(Prompt retPrompt, Animation animation, TriggerBuilder triggerBuilder) {
         super("l", "r", "b", "c");
         this.retPrompt = retPrompt;
@@ -52,16 +52,21 @@ public class EditBlockTriggerConversationPrompt extends BaseEditorFixedSetPrompt
     @Override
     protected Prompt acceptValidatedInput(ConversationContext cc, String string) {
         if ("c".equalsIgnoreCase(string)) {
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
         } else if ("l".equalsIgnoreCase(string) || "r".equalsIgnoreCase(string) || "b".equalsIgnoreCase(string)) {
             MouseButton button = MouseButton.fromString(string);
             Location l = Animations.getBlockSelection((Player) cc.getForWhom());
             if (l == null) {
-                return new ConversationResponsePrompt(this, MessageUtil.formatErrorMessage(Messages.MSG_EDIT_BLOCK_TRIGGER_NOBLOCK));
+                return new ConversationResponsePrompt(
+                        this, MessageUtil.formatErrorMessage(Messages.MSG_EDIT_BLOCK_TRIGGER_NOBLOCK));
             } else {
-                triggerBuilder.setTriggerBlock(AnimationsLocation.fromLocation(l)).setTriggerButton(button);
+                triggerBuilder
+                        .setTriggerBlock(AnimationsLocation.fromLocation(l))
+                        .setTriggerButton(button);
                 animation.setTriggerBuilderData(triggerBuilder.createBuilderData());
-                return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
+                return new ConversationResponsePrompt(
+                        retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
             }
         } else {
             return this;
@@ -70,7 +75,8 @@ public class EditBlockTriggerConversationPrompt extends BaseEditorFixedSetPrompt
 
     @Override
     public String getPromptText(ConversationContext cc) {
-        return MessageUtil.formatPromptMessage(Messages.MSG_EDIT_BLOCK_TRIGGER, Animations.getBlockSelectorMaterial().toString());
+        return MessageUtil.formatPromptMessage(
+                Messages.MSG_EDIT_BLOCK_TRIGGER,
+                Animations.getBlockSelectorMaterial().toString());
     }
-    
 }

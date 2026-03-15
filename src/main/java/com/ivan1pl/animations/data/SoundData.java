@@ -19,9 +19,8 @@
 package com.ivan1pl.animations.data;
 
 import com.ivan1pl.animations.constants.SoundPlayMode;
-import org.bukkit.configuration.ConfigurationSection;
-
 import java.io.Serializable;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  *
@@ -79,11 +78,11 @@ public class SoundData implements Serializable {
 
     public void save(ConfigurationSection config) {
         ConfigurationSection section = config.createSection("SoundData");
-        if(name!=null) section.set("Name",name);
-        if(playMode!=null) section.set("PlayMode",playMode.name());
-        section.set("Range",range);
-        section.set("Pitch",pitch);
-        section.set("Volume",volume);
+        if (name != null) section.set("Name", name);
+        if (playMode != null) section.set("PlayMode", playMode.name());
+        section.set("Range", range);
+        section.set("Pitch", pitch);
+        section.set("Volume", volume);
     }
 
     public static SoundData load(ConfigurationSection config) {

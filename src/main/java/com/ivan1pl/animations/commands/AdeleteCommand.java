@@ -38,28 +38,28 @@ public class AdeleteCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> command() {
         return Commands.literal("adelete")
-            .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
-            .then(Commands.argument("name", StringArgumentType.word())
-                .suggests((ctx, builder) -> {
-                    for (String name : Animations.getAnimationNames()) builder.suggest(name);
-                    return builder.buildFuture();
-                })
-                .executes(ctx -> {
-                    CommandSender sender = ctx.getSource().getSender();
-                    String name = StringArgumentType.getString(ctx, "name");
-                    Animation animation = Animations.getAnimation(name);
-                    if (animation != null) {
-                        animation.stop();
-                        boolean success = Animations.deleteAnimation(name);
-                        if (success) {
-                            MessageUtil.sendInfoMessage(sender, Messages.MSG_ANIMATION_DELETED);
-                        } else {
-                            MessageUtil.sendErrorMessage(sender, Messages.MSG_DELETE_FAILED, name);
-                        }
-                    } else {
-                        MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
-                    }
-                    return Command.SINGLE_SUCCESS;
-                }));
+                .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
+                .then(Commands.argument("name", StringArgumentType.word())
+                        .suggests((ctx, builder) -> {
+                            for (String name : Animations.getAnimationNames()) builder.suggest(name);
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            CommandSender sender = ctx.getSource().getSender();
+                            String name = StringArgumentType.getString(ctx, "name");
+                            Animation animation = Animations.getAnimation(name);
+                            if (animation != null) {
+                                animation.stop();
+                                boolean success = Animations.deleteAnimation(name);
+                                if (success) {
+                                    MessageUtil.sendInfoMessage(sender, Messages.MSG_ANIMATION_DELETED);
+                                } else {
+                                    MessageUtil.sendErrorMessage(sender, Messages.MSG_DELETE_FAILED, name);
+                                }
+                            } else {
+                                MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
+                            }
+                            return Command.SINGLE_SUCCESS;
+                        }));
     }
 }

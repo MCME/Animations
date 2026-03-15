@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * @author Eriol_Eandur
  */
 public class SerializationUtils {
-    
+
     public static <T extends Serializable> T clone(T object) {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         try {

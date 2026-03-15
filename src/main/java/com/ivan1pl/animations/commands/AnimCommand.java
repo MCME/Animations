@@ -39,21 +39,23 @@ public class AnimCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> command() {
         return Commands.literal("anim")
-            .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
-            .then(Commands.argument("name", StringArgumentType.word())
-                .suggests((ctx, builder) -> {
-                    for (String name : Animations.getAnimationNames()) builder.suggest(name);
-                    return builder.buildFuture();
-                })
-                .executes(ctx -> {
-                    CommandSender sender = ctx.getSource().getSender();
-                    if (!(sender instanceof Player player)) {
-                        MessageUtil.sendErrorMessage(sender, Messages.MSG_PLAYER_ONLY);
-                        return 0;
-                    }
-                    String name = StringArgumentType.getString(ctx, "name");
-                    AnimationsPlugin.getPluginInstance().getConversationFactory().startConversation(player, name);
-                    return Command.SINGLE_SUCCESS;
-                }));
+                .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
+                .then(Commands.argument("name", StringArgumentType.word())
+                        .suggests((ctx, builder) -> {
+                            for (String name : Animations.getAnimationNames()) builder.suggest(name);
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            CommandSender sender = ctx.getSource().getSender();
+                            if (!(sender instanceof Player player)) {
+                                MessageUtil.sendErrorMessage(sender, Messages.MSG_PLAYER_ONLY);
+                                return 0;
+                            }
+                            String name = StringArgumentType.getString(ctx, "name");
+                            AnimationsPlugin.getPluginInstance()
+                                    .getConversationFactory()
+                                    .startConversation(player, name);
+                            return Command.SINGLE_SUCCESS;
+                        }));
     }
 }

@@ -17,14 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Replacement for removed WE classed, needed by Animation ObjectStream
+// Replacement for removed WE classed, needed by Animation ObjectStream
 package com.sk89q.worldedit;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-
 import javax.annotation.Nullable;
 
 /**
@@ -495,9 +493,7 @@ public class Vector implements Comparable<Vector> {
      * @return distance
      */
     public double distance(Vector other) {
-        return Math.sqrt(Math.pow(other.x - x, 2) +
-                Math.pow(other.y - y, 2) +
-                Math.pow(other.z - z, 2));
+        return Math.sqrt(Math.pow(other.x - x, 2) + Math.pow(other.y - y, 2) + Math.pow(other.z - z, 2));
     }
 
     /**
@@ -507,9 +503,7 @@ public class Vector implements Comparable<Vector> {
      * @return distance
      */
     public double distanceSq(Vector other) {
-        return Math.pow(other.x - x, 2) +
-                Math.pow(other.y - y, 2) +
-                Math.pow(other.z - z, 2);
+        return Math.pow(other.x - x, 2) + Math.pow(other.y - y, 2) + Math.pow(other.z - z, 2);
     }
 
     /**
@@ -539,11 +533,7 @@ public class Vector implements Comparable<Vector> {
      * @return the cross product of this and the other vector
      */
     public Vector cross(Vector other) {
-        return new Vector(
-            y * other.z - z * other.y,
-            z * other.x - x * other.z,
-            x * other.y - y * other.x
-        );
+        return new Vector(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
     }
 
     /**
@@ -566,9 +556,12 @@ public class Vector implements Comparable<Vector> {
      * @return true if the vector is contained
      */
     public boolean containedWithinBlock(Vector min, Vector max) {
-        return getBlockX() >= min.getBlockX() && getBlockX() <= max.getBlockX()
-                && getBlockY() >= min.getBlockY() && getBlockY() <= max.getBlockY()
-                && getBlockZ() >= min.getBlockZ() && getBlockZ() <= max.getBlockZ();
+        return getBlockX() >= min.getBlockX()
+                && getBlockX() <= max.getBlockX()
+                && getBlockY() >= min.getBlockY()
+                && getBlockY() <= max.getBlockY()
+                && getBlockZ() >= min.getBlockZ()
+                && getBlockZ() <= max.getBlockZ();
     }
 
     /**
@@ -639,11 +632,7 @@ public class Vector implements Comparable<Vector> {
         double x2 = x * Math.cos(angle) - z * Math.sin(angle);
         double z2 = x * Math.sin(angle) + z * Math.cos(angle);
 
-        return new Vector(
-            x2 + aboutX + translateX,
-            y,
-            z2 + aboutZ + translateZ
-        );
+        return new Vector(x2 + aboutX + translateX, y, z2 + aboutZ + translateZ);
     }
 
     /**
@@ -732,11 +721,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new {@code BlockVector}
      */
     public static BlockVector3 toBlockPoint(double x, double y, double z) {
-        return BlockVector3.at(
-            (int) Math.floor(x),
-            (int) Math.floor(y),
-            (int) Math.floor(z)
-        );
+        return BlockVector3.at((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
     }
 
     /**
@@ -745,11 +730,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new {@code BlockVector}
      */
     public BlockVector3 toBlockPoint() {
-        return BlockVector3.at(
-            Math.floor(x),
-            Math.floor(y),
-            Math.floor(z)
-        );
+        return BlockVector3.at(Math.floor(x), Math.floor(y), Math.floor(z));
     }
 
     /**
@@ -758,7 +739,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new {@code BlockVector}
      */
     public BlockVector3 toBlockVector() {
-        return BlockVector3.at(x,y,z);
+        return BlockVector3.at(x, y, z);
     }
 
     /**
@@ -809,11 +790,7 @@ public class Vector implements Comparable<Vector> {
      * @return minimum
      */
     public static Vector getMinimum(Vector v1, Vector v2) {
-        return new Vector(
-                Math.min(v1.x, v2.x),
-                Math.min(v1.y, v2.y),
-                Math.min(v1.z, v2.z)
-        );
+        return new Vector(Math.min(v1.x, v2.x), Math.min(v1.y, v2.y), Math.min(v1.z, v2.z));
     }
 
     /**
@@ -824,11 +801,7 @@ public class Vector implements Comparable<Vector> {
      * @return maximum
      */
     public static Vector getMaximum(Vector v1, Vector v2) {
-        return new Vector(
-                Math.max(v1.x, v2.x),
-                Math.max(v1.y, v2.y),
-                Math.max(v1.z, v2.z)
-        );
+        return new Vector(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y), Math.max(v1.z, v2.z));
     }
 
     /**
@@ -839,11 +812,6 @@ public class Vector implements Comparable<Vector> {
      * @return maximum
      */
     public static Vector getMidpoint(Vector v1, Vector v2) {
-        return new Vector(
-                (v1.x + v2.x) / 2,
-                (v1.y + v2.y) / 2,
-                (v1.z + v2.z) / 2
-        );
+        return new Vector((v1.x + v2.x) / 2, (v1.y + v2.y) / 2, (v1.z + v2.z) / 2);
     }
-
 }

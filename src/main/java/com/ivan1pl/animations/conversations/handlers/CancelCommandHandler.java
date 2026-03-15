@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -34,19 +34,20 @@ import org.bukkit.conversations.Prompt;
 public class CancelCommandHandler extends ConversationCommandHandler {
 
     private final Prompt successPrompt;
-    
+
     public CancelCommandHandler(Prompt successPrompt) {
         super("cancel", 0);
         this.successPrompt = successPrompt;
     }
-    
+
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation != null) {
             animation.stop();
             Animations.reloadAnimation(animationName);
         }
-        return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_CANCELLED));
+        return new ConversationResponsePrompt(
+                successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_CANCELLED));
     }
-    
 }

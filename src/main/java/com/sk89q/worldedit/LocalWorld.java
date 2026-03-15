@@ -10,6 +10,6 @@ package com.sk89q.worldedit;
  * @author Eriol_Eandur
  */
 public class LocalWorld {
-    //Just to give the compiler a LocalWorld
-    //Cannot access LocalWorld error otherwise
+    // Just to give the compiler a LocalWorld
+    // Cannot access LocalWorld error otherwise
 }

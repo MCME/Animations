@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -39,11 +39,11 @@ import org.bukkit.entity.Player;
  * @author Ivan1pl
  */
 public class YCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     private final Prompt failPrompt;
-    
+
     private final EditAnimationConversationPrompt affectedPrompt;
 
     public YCommandHandler(Prompt successPrompt, Prompt failPrompt, EditAnimationConversationPrompt affectedPrompt) {
@@ -54,10 +54,13 @@ public class YCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         Selection sel = Animations.getSelection((Player) cc.getForWhom());
         if (!Animations.validateSelectionSize(sel)) {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_SELECTION_TOO_BIG, Animations.getMaxFrameSize()));
+            return new ConversationResponsePrompt(
+                    failPrompt,
+                    MessageUtil.formatErrorMessage(Messages.MSG_SELECTION_TOO_BIG, Animations.getMaxFrameSize()));
         }
         try {
             Animation anim;
@@ -70,7 +73,7 @@ public class YCommandHandler extends ConversationCommandHandler {
                     anim = new StationaryAnimation(sel);
                     break;
             }
-            
+
             Animations.setAnimation(animationName, anim);
             OperationResult result = Animations.saveAnimation(animationName);
             String message = "";
@@ -88,8 +91,8 @@ public class YCommandHandler extends ConversationCommandHandler {
             }
             return new ConversationResponsePrompt(successPrompt, message);
         } catch (InvalidSelectionException ex) {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_SELECTION));
+            return new ConversationResponsePrompt(
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_SELECTION));
         }
     }
-    
 }

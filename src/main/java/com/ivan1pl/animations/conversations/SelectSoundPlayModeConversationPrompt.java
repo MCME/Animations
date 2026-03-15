@@ -48,7 +48,8 @@ public class SelectSoundPlayModeConversationPrompt extends BaseEditorFixedSetPro
     @Override
     protected Prompt acceptValidatedInput(ConversationContext cc, String string) {
         if ("c".equalsIgnoreCase(string)) {
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_SELECT_SOUND_CANCELLED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_SELECT_SOUND_CANCELLED));
         } else {
             soundData.setPlayMode(SoundPlayMode.fromString(string));
             animation.setSoundData(soundData);
@@ -60,5 +61,4 @@ public class SelectSoundPlayModeConversationPrompt extends BaseEditorFixedSetPro
     public String getPromptText(ConversationContext cc) {
         return MessageUtil.formatPromptMessage(Messages.MSG_SELECT_SOUND_PLAY_MODE);
     }
-
 }

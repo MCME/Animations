@@ -38,22 +38,22 @@ public class AplayCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> command() {
         return Commands.literal("aplay")
-            .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_USER))
-            .then(Commands.argument("name", StringArgumentType.word())
-                .suggests((ctx, builder) -> {
-                    for (String name : Animations.getAnimationNames()) builder.suggest(name);
-                    return builder.buildFuture();
-                })
-                .executes(ctx -> {
-                    CommandSender sender = ctx.getSource().getSender();
-                    String name = StringArgumentType.getString(ctx, "name");
-                    Animation animation = Animations.getAnimation(name);
-                    if (animation != null) {
-                        animation.play();
-                    } else {
-                        MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
-                    }
-                    return Command.SINGLE_SUCCESS;
-                }));
+                .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_USER))
+                .then(Commands.argument("name", StringArgumentType.word())
+                        .suggests((ctx, builder) -> {
+                            for (String name : Animations.getAnimationNames()) builder.suggest(name);
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            CommandSender sender = ctx.getSource().getSender();
+                            String name = StringArgumentType.getString(ctx, "name");
+                            Animation animation = Animations.getAnimation(name);
+                            if (animation != null) {
+                                animation.play();
+                            } else {
+                                MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
+                            }
+                            return Command.SINGLE_SUCCESS;
+                        }));
     }
 }

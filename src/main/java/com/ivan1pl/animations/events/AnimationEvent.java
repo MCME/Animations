@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -27,15 +27,15 @@ import org.jetbrains.annotations.NotNull;
  * @author Ivan1pl
  */
 public abstract class AnimationEvent extends org.bukkit.event.Event {
-    
+
     private static final HandlerList handlers = new HandlerList();
-    
+
     private final Animation animation;
-    
+
     public AnimationEvent(Animation animation) {
         this.animation = animation;
     }
-    
+
     @Override
     public @NotNull HandlerList getHandlers() {
         return handlers;

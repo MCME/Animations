@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -25,10 +25,10 @@ import com.ivan1pl.animations.data.Animation;
  * @author Ivan1pl
  */
 public class AnimationFrameDisplayedEvent extends AnimationEvent {
-    
+
     private final int frame;
     private final boolean reverse;
-    
+
     public AnimationFrameDisplayedEvent(Animation animation, int frame, boolean reverse) {
         super(animation);
         this.frame = frame;

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,24 +35,24 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @author Ivan1pl
  */
 public class AnimationTask extends BukkitRunnable {
-    
+
     private final Animation animation;
-    
+
     private int stage = 0;
-    
+
     private final boolean reverse;
-    
+
     private final EventDispatcher dispatcher = new EventDispatcher();
-    
+
     public AnimationTask(Animation animation) {
         this(animation, false);
     }
-    
+
     public AnimationTask(Animation animation, boolean reverse) {
         this.animation = animation;
         this.reverse = reverse;
     }
-    
+
     public void start() {
         this.runTaskTimer(AnimationsPlugin.getPluginInstance(), 0, animation.getInterval());
     }
@@ -61,13 +61,14 @@ public class AnimationTask extends BukkitRunnable {
     public void run() {
         if (reverse) {
             if (stage < animation.getFrameCount()) {
-                animation.showFrame(animation.getFrameCount()-stage-1);
+                animation.showFrame(animation.getFrameCount() - stage - 1);
                 playSoundIfNecessary();
-                Animations.callEvent(new AnimationFrameDisplayedEvent(animation, animation.getFrameCount()-stage-1, true));
+                Animations.callEvent(
+                        new AnimationFrameDisplayedEvent(animation, animation.getFrameCount() - stage - 1, true));
             }
             stage++;
             if (stage > 1 && animation instanceof MovingAnimation && stage <= animation.getFrameCount()) {
-                ((MovingAnimation) animation).movePlayers(animation.getFrameCount()-stage,true);
+                ((MovingAnimation) animation).movePlayers(animation.getFrameCount() - stage, true);
             }
             if (stage > animation.getFrameCount()) {
                 Animations.deleteTask(this);
@@ -82,7 +83,7 @@ public class AnimationTask extends BukkitRunnable {
             }
             stage++;
             if (stage > 1 && animation instanceof MovingAnimation && stage <= animation.getFrameCount()) {
-                ((MovingAnimation) animation).movePlayers(stage-1,false);
+                ((MovingAnimation) animation).movePlayers(stage - 1, false);
             }
             if (stage > animation.getFrameCount()) {
                 Animations.deleteTask(this);
@@ -91,35 +92,37 @@ public class AnimationTask extends BukkitRunnable {
             }
         }
     }
-    
+
     public synchronized void stop() {
         int id = this.getTaskId();
-        if (Bukkit.getScheduler().isCurrentlyRunning(id) || Bukkit.getScheduler().isQueued(id)) {
+        if (Bukkit.getScheduler().isCurrentlyRunning(id)
+                || Bukkit.getScheduler().isQueued(id)) {
             this.cancel();
         }
         stage = animation.getFrameCount() + 1;
         animation.showFrame(0);
     }
-    
+
     public void attachListener(EventListener listener) {
         dispatcher.addEventListener(Event.ANIMATION_FINISHED, listener);
     }
-    
+
     public void detachListener(EventListener listener) {
         dispatcher.removeEventListener(Event.ANIMATION_FINISHED, listener);
     }
 
     private void playSoundIfNecessary() {
-//Logger.getGlobal().info("playSoundIfNecessary: "+animation.getName()+" "+animation.getSoundData());
+        // Logger.getGlobal().info("playSoundIfNecessary: "+animation.getName()+" "+animation.getSoundData());
         if (animation.getSoundData() == null) {
-//Logger.getGlobal().info("No sound data");
+            // Logger.getGlobal().info("No sound data");
             return;
         }
-//Logger.getGlobal().info("Mode: "+animation.getSoundData().getPlayMode()+" Frame: "+stage);
-        if (animation.getSoundData().getPlayMode() == SoundPlayMode.ALL_FRAMES ||
-                (animation.getSoundData().getPlayMode() == SoundPlayMode.BEGIN && stage == 0) ||
-                (animation.getSoundData().getPlayMode() == SoundPlayMode.END && stage == animation.getFrameCount() - 1)) {
-//Logger.getGlobal().info("play sound");
+        // Logger.getGlobal().info("Mode: "+animation.getSoundData().getPlayMode()+" Frame: "+stage);
+        if (animation.getSoundData().getPlayMode() == SoundPlayMode.ALL_FRAMES
+                || (animation.getSoundData().getPlayMode() == SoundPlayMode.BEGIN && stage == 0)
+                || (animation.getSoundData().getPlayMode() == SoundPlayMode.END
+                        && stage == animation.getFrameCount() - 1)) {
+            // Logger.getGlobal().info("play sound");
             animation.playSound();
         }
     }

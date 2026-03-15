@@ -24,7 +24,7 @@ import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.triggers.TriggerBuilder;
 import com.ivan1pl.animations.utils.ArrayUtils;
 import com.ivan1pl.animations.utils.MessageUtil;
-//import org.apache.commons.lang3.ArrayUtils;
+// import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 
@@ -50,10 +50,12 @@ public class SelectAnimationConversationPrompt extends BaseEditorFixedSetPrompt 
     @Override
     protected Prompt acceptValidatedInput(ConversationContext cc, String string) {
         if ("c".equalsIgnoreCase(string)) {
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
         } else {
             triggerBuilder.setAnimationName(string);
-            return new ConversationResponsePrompt(new SelectFrameConversationPrompt(retPrompt, animation, triggerBuilder),
+            return new ConversationResponsePrompt(
+                    new SelectFrameConversationPrompt(retPrompt, animation, triggerBuilder),
                     MessageUtil.formatInfoMessage(Messages.MSG_ANIMATION_SELECTED));
         }
     }

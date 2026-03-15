@@ -67,7 +67,8 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
     @Override
     protected Prompt acceptValidatedInput(ConversationContext cc, String string) {
         if ("cancel".equalsIgnoreCase(string)) {
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_SELECT_SOUND_CANCELLED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_SELECT_SOUND_CANCELLED));
         } else {
             String[] params = string.split("\\s+");
             if (params.length == 2) {
@@ -75,16 +76,21 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
                     String soundName = getSound(params[1]);
                     if (soundName != null) {
                         soundData.setName(soundName);
-                        return new ConversationResponsePrompt(new SelectSoundPlayModeConversationPrompt(retPrompt, animation, soundData),
+                        return new ConversationResponsePrompt(
+                                new SelectSoundPlayModeConversationPrompt(retPrompt, animation, soundData),
                                 MessageUtil.formatInfoMessage(Messages.MSG_SOUND_SELECTED));
                     } else {
-                        return new ConversationResponsePrompt(this, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_SOUND, params[1]));
+                        return new ConversationResponsePrompt(
+                                this, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_SOUND, params[1]));
                     }
                 } else if (params[0].equalsIgnoreCase("list")) {
                     if (isValidPage(Integer.parseUnsignedInt(params[1]))) {
                         return displayPage(Integer.parseUnsignedInt(params[1]));
                     } else {
-                        return new ConversationResponsePrompt(this, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_PAGE, Integer.parseUnsignedInt(params[1]), pageCount));
+                        return new ConversationResponsePrompt(
+                                this,
+                                MessageUtil.formatErrorMessage(
+                                        Messages.MSG_INVALID_PAGE, Integer.parseUnsignedInt(params[1]), pageCount));
                     }
                 } else {
                     return this;
@@ -98,7 +104,7 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
     }
 
     private Prompt displayPage(int page) {
-        int startIndex = (page-1) * PAGE_SIZE;
+        int startIndex = (page - 1) * PAGE_SIZE;
         int stopIndex = Math.min(page * PAGE_SIZE - 1, sounds.length - 1);
         String soundList = "";
         for (int i = startIndex; i <= stopIndex; ++i) {
@@ -108,7 +114,8 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
                 soundList = soundList + ", " + sounds[i];
             }
         }
-        return new ConversationResponsePrompt(this, MessageUtil.formatInfoMessage(Messages.MSG_SOUND_LIST, page, pageCount, soundList));
+        return new ConversationResponsePrompt(
+                this, MessageUtil.formatInfoMessage(Messages.MSG_SOUND_LIST, page, pageCount, soundList));
     }
 
     @Override
@@ -146,5 +153,4 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
     private boolean isValidPage(int page) {
         return page > 0 && page <= pageCount;
     }
-
 }

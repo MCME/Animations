@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,14 +35,16 @@ import org.bukkit.inventory.EquipmentSlot;
  * @author Ivan1pl
  */
 public class PlayerListener implements Listener {
-    
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (event.isCancelled() || !player.hasPermission(Permissions.PERMISSION_ADMIN) || event.getHand() != EquipmentSlot.HAND) {
+        if (event.isCancelled()
+                || !player.hasPermission(Permissions.PERMISSION_ADMIN)
+                || event.getHand() != EquipmentSlot.HAND) {
             return;
         }
-        
+
         if (player.getInventory().getItemInMainHand().getType().equals(Animations.getWandMaterial())) {
             Selection selection = Animations.getSelection(player);
 
@@ -66,12 +68,12 @@ public class PlayerListener implements Listener {
                 }
             }
         } else if (player.getInventory().getItemInMainHand().getType().equals(Animations.getBlockSelectorMaterial())) {
-            if (event.getAction().equals(Action.LEFT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)
+                    || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 event.setCancelled(true);
                 Animations.setBlockSelection(player, event.getClickedBlock().getLocation());
                 MessageUtil.sendInfoMessage(player, Messages.MSG_BLOCK_SELECTION_SET);
             }
         }
     }
-    
 }

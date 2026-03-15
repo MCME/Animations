@@ -40,9 +40,9 @@ public class DeletesoundCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         animation.setSoundData(null);
         return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_SOUND_DELETED));
     }
-
 }

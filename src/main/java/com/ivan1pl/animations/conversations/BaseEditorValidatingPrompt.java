@@ -33,12 +33,14 @@ public abstract class BaseEditorValidatingPrompt extends ValidatingPrompt {
     @Override
     public final Prompt acceptInput(ConversationContext context, String input) {
         String escapeString = Animations.getEditorEscapeString();
-        if (input != null && escapeString != null && escapeString.length() > 0 &&
-                input.startsWith(escapeString) && context.getForWhom() instanceof Player) {
+        if (input != null
+                && escapeString != null
+                && escapeString.length() > 0
+                && input.startsWith(escapeString)
+                && context.getForWhom() instanceof Player) {
             ((Player) context.getForWhom()).chat(input.replaceFirst(escapeString, ""));
             return this;
         }
         return super.acceptInput(context, input);
     }
-
 }

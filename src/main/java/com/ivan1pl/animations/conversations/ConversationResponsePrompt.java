@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -27,11 +27,11 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class ConversationResponsePrompt extends MessagePrompt {
-    
+
     private final Prompt next;
-    
+
     private final String message;
-    
+
     public ConversationResponsePrompt(Prompt next, String message) {
         this.next = next;
         this.message = message;
@@ -46,5 +46,4 @@ public class ConversationResponsePrompt extends MessagePrompt {
     public String getPromptText(ConversationContext cc) {
         return message;
     }
-    
 }

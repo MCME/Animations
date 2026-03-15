@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -34,16 +34,21 @@ import org.bukkit.inventory.EquipmentSlot;
  * @author Ivan1pl
  */
 public class TwoBlockTrigger extends BaseTrigger {
-    
+
     private final AnimationsLocation triggerBlock1;
-    
+
     private final MouseButton triggerButton1;
-    
+
     private final AnimationsLocation triggerBlock2;
-    
+
     private final MouseButton triggerButton2;
-    
-    public TwoBlockTrigger(Animation animation, AnimationsLocation triggerBlock1, MouseButton triggerButton1, AnimationsLocation triggerBlock2, MouseButton triggerButton2) {
+
+    public TwoBlockTrigger(
+            Animation animation,
+            AnimationsLocation triggerBlock1,
+            MouseButton triggerButton1,
+            AnimationsLocation triggerBlock2,
+            MouseButton triggerButton2) {
         super(animation);
         this.triggerBlock1 = triggerBlock1;
         this.triggerBlock2 = triggerBlock2;
@@ -52,58 +57,68 @@ public class TwoBlockTrigger extends BaseTrigger {
     }
 
     @Override
-    public void execute() {
-    }
-    
+    public void execute() {}
+
     private boolean checkAction1(Action action) {
-        if (null != triggerButton1) return switch (triggerButton1) {
-            case BOTH -> action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK;
-            case LEFT -> action == Action.LEFT_CLICK_BLOCK;
-            case RIGHT -> action == Action.RIGHT_CLICK_BLOCK;
-        };
+        if (null != triggerButton1)
+            return switch (triggerButton1) {
+                case BOTH -> action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK;
+                case LEFT -> action == Action.LEFT_CLICK_BLOCK;
+                case RIGHT -> action == Action.RIGHT_CLICK_BLOCK;
+            };
         return false;
     }
-    
+
     private boolean checkAction2(Action action) {
-        if (null != triggerButton2) return switch (triggerButton2) {
-            case BOTH -> action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK;
-            case LEFT -> action == Action.LEFT_CLICK_BLOCK;
-            case RIGHT -> action == Action.RIGHT_CLICK_BLOCK;
-        };
+        if (null != triggerButton2)
+            return switch (triggerButton2) {
+                case BOTH -> action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK;
+                case LEFT -> action == Action.LEFT_CLICK_BLOCK;
+                case RIGHT -> action == Action.RIGHT_CLICK_BLOCK;
+            };
         return false;
     }
-    
+
     @EventHandler
     public void onPlayerInteractBlock(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (event.isCancelled() || event.getHand() != EquipmentSlot.HAND
-                || (!checkAction1(event.getAction()) && !checkAction2(event.getAction())) ||
-                (player.hasPermission(Permissions.PERMISSION_ADMIN)
-                && (player.getInventory().getItemInMainHand().getType().equals(Animations.getWandMaterial()) ||
-                    player.getInventory().getItemInMainHand().getType().equals(Animations.getBlockSelectorMaterial())))) {
+        if (event.isCancelled()
+                || event.getHand() != EquipmentSlot.HAND
+                || (!checkAction1(event.getAction()) && !checkAction2(event.getAction()))
+                || (player.hasPermission(Permissions.PERMISSION_ADMIN)
+                        && (player.getInventory().getItemInMainHand().getType().equals(Animations.getWandMaterial())
+                                || player.getInventory()
+                                        .getItemInMainHand()
+                                        .getType()
+                                        .equals(Animations.getBlockSelectorMaterial())))) {
             return;
         }
-        
-        if (AnimationsLocation.isSameBlock(triggerBlock1, AnimationsLocation.fromLocation(event.getClickedBlock().getLocation())) && checkAction1(event.getAction())) {
+
+        if (AnimationsLocation.isSameBlock(
+                        triggerBlock1,
+                        AnimationsLocation.fromLocation(event.getClickedBlock().getLocation()))
+                && checkAction1(event.getAction())) {
             event.setCancelled(true);
             executeFirst();
         }
-        if (AnimationsLocation.isSameBlock(triggerBlock2, AnimationsLocation.fromLocation(event.getClickedBlock().getLocation())) && checkAction2(event.getAction())) {
+        if (AnimationsLocation.isSameBlock(
+                        triggerBlock2,
+                        AnimationsLocation.fromLocation(event.getClickedBlock().getLocation()))
+                && checkAction2(event.getAction())) {
             event.setCancelled(true);
             executeSecond();
         }
     }
-    
+
     private void executeFirst() {
         if (!isStarted() && !isFinished()) {
             startAnimation();
         }
     }
-    
+
     private void executeSecond() {
         if (!isStarted() && isFinished()) {
             startReverseAnimation();
         }
     }
-    
 }
