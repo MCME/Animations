@@ -3,21 +3,10 @@ main: com.ivan1pl.animations.AnimationsPlugin
 version: ${project.version}
 description: Animations plugin
 load: POSTWORLD
+# Q: Remove bukkit?
 softdepend: [worldedit-bukkit, bukkit, PluginUtils]
-api-version: 1.19
-commands:
-    anim:
-        description: Create or edit animation.
-        usage: /anim <animation_name>
-    aplay:
-        description: Play animation.
-        usage: /aplay <animation_name>
-    alist:
-        description: List animations.
-        usage: /alist [page]
-    adelete:
-        description: Delete animation.
-        usage: /adelete <animation_name>
+api-version: 1.21
+# Q: Delete this? Keep it so you don't need luckperms setup?
 permissions:
     animations.*:
         description: Gives access to all animations commands.

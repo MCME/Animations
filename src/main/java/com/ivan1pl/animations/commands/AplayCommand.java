@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -23,27 +23,37 @@ import com.ivan1pl.animations.constants.Permissions;
 import com.ivan1pl.animations.data.Animation;
 import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.utils.MessageUtil;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
 
 /**
  *
  * @author Ivan1pl
  */
-public class AplayCommand extends AnimationsCommand {
-    
-    public AplayCommand() {
-        super(Permissions.PERMISSION_USER, 1);
-    }
+public class AplayCommand {
 
-    @Override
-    protected void execute(CommandSender cs, String... args) {
-        String name = args[0];
-        Animation animation = Animations.getAnimation(name);
-        if (animation != null) {
-            animation.play();
-        } else {
-            MessageUtil.sendErrorMessage(cs, Messages.MSG_ANIMATION_NOT_FOUND, name);
-        }
+    public static LiteralArgumentBuilder<CommandSourceStack> command() {
+        return Commands.literal("aplay")
+            .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_USER))
+            .then(Commands.argument("name", StringArgumentType.word())
+                .suggests((ctx, builder) -> {
+                    for (String name : Animations.getAnimationNames()) builder.suggest(name);
+                    return builder.buildFuture();
+                })
+                .executes(ctx -> {
+                    CommandSender sender = ctx.getSource().getSender();
+                    String name = StringArgumentType.getString(ctx, "name");
+                    Animation animation = Animations.getAnimation(name);
+                    if (animation != null) {
+                        animation.play();
+                    } else {
+                        MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
+                    }
+                    return Command.SINGLE_SUCCESS;
+                }));
     }
-    
 }
