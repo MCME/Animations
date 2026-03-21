@@ -25,7 +25,8 @@ import com.ivan1pl.animations.tasks.AnimationTask;
 import com.ivan1pl.animations.triggers.Trigger;
 import com.ivan1pl.animations.triggers.TriggerBuilder;
 import com.ivan1pl.animations.utils.MessageUtil;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.*;
@@ -80,21 +81,6 @@ public class Animations {
     public static void reload() {
         debugMode = AnimationsPlugin.getPluginInstance().getConfig().getBoolean("debug.enabled");
 
-        FilenameFilter aFilter = new FilenameFilter() {
-
-            @Override
-            public boolean accept(File file, String string) {
-                return string.endsWith(".anim");
-            }
-        };
-        FilenameFilter weAnimFilter = new FilenameFilter() {
-
-            @Override
-            public boolean accept(File file, String string) {
-                return new File(file, string).isDirectory();
-            }
-        };
-
         String wand = AnimationsPlugin.getPluginInstance().getConfig().getString("wand");
         wandMaterial = Material.valueOf(wand);
 
@@ -131,17 +117,9 @@ public class Animations {
         }
         triggers.clear();
 
-        for (File f : PLUGIN_DIR.listFiles(weAnimFilter)) {
+        for (File f : PLUGIN_DIR.listFiles(File::isDirectory)) {
             String name = f.getName();
-
             reloadAnimation(name);
-        }
-        for (File f : PLUGIN_DIR.listFiles(aFilter)) {
-            String name = f.getName();
-            name = name.substring(0, name.length() - 5);
-            if (!animations.containsKey(name)) {
-                reloadAnimation(name);
-            }
         }
     }
 
@@ -166,50 +144,28 @@ public class Animations {
     }
 
     private static boolean saveAnimation(String name, Animation animation) {
-        // FileOutputStream fstream = null;
-        // ObjectOutputStream ostream = null;
         boolean result = true;
         try {
             File folder = new File(PLUGIN_DIR, name);
             if (!folder.exists()) {
                 folder.mkdir();
             }
-            // File f = new File(folder, "data.anim");
             File f = new File(folder, "animation.yml");
             Files.deleteIfExists(f.toPath());
 
-            // fstream = new FileOutputStream(f);
-            // ostream = new ObjectOutputStream(fstream);
             YamlConfiguration config = new YamlConfiguration();
-
-            // ostream.writeObject(animation);
-            // animation.saveTo(folder, ostream);
             animation.save(folder, config);
             config.save(f);
         } catch (IOException ex) {
             Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, null, ex);
             result = false;
-        } /* finally {
-              try {
-                  if (ostream != null) {
-                      ostream.close();
-                  }
-                  if (fstream != null) {
-                      fstream.close();
-                  }
-              } catch (IOException ex) {
-                  Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, null, ex);
-                  result = false;
-              }
-          }*/
+        }
         return result;
     }
 
     public static boolean deleteAnimation(String name) {
-        File f = new File(PLUGIN_DIR, name + ".anim");
         File folder = new File(PLUGIN_DIR, name);
-        boolean retval =
-                f.delete() || new File(folder, "data.anim").delete() || new File(folder, "animation.yml").delete();
+        boolean retval = new File(folder, "animation.yml").delete();
         for (File file : folder.listFiles()) {
             retval = retval && file.delete();
         }
@@ -256,34 +212,10 @@ public class Animations {
 
     public static void reloadAnimation(String name) {
         File f = new File(new File(PLUGIN_DIR, name), "animation.yml");
-        // File f = new File(new File(PLUGIN_DIR, name),"data.anim");
-        boolean conversion = false;
-        if (!f.exists()) {
-            conversion = true;
-            f = new File(new File(PLUGIN_DIR, name), "data.anim");
-            if (!f.exists()) {
-                f = new File(PLUGIN_DIR, name + ".anim");
-            }
-        }
-        FileInputStream fstream = null;
-        ObjectInputStream ostream = null;
         try {
-            Animation animation;
-            if (conversion) {
-                fstream = new FileInputStream(f);
-                ostream = new ObjectInputStream(fstream);
-
-                animation = (Animation) ostream.readObject();
-            } else {
-                animation = AnimationFactory.loadAnimation(f);
-            }
-
+            Animation animation = AnimationFactory.loadAnimation(f);
             if (animation != null) {
-                if (conversion) {
-                    Logger.getLogger(Animations.class.getName()).log(Level.INFO, "Converting old Animation: " + name);
-                } else {
-                    Logger.getLogger(Animations.class.getName()).log(Level.INFO, "Loading Animation: " + name);
-                }
+                Logger.getLogger(Animations.class.getName()).log(Level.INFO, "Loading Animation: " + name);
                 if (!animation.prepare(new File(PLUGIN_DIR, name))) {
                     Logger.getLogger(Animations.class.getName())
                             .log(Level.WARNING, "Error while preparing Animation: " + name);
@@ -311,24 +243,10 @@ public class Animations {
                     t.register();
                     triggers.put(animation, t);
                 }
-                if (conversion) {
-                    saveAnimation(name, animation);
-                }
                 AnimationsPlugin.getPluginInstance().getLogger().info(Messages.INFO_ANIMATION_LOADED + name);
             }
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (ostream != null) {
-                    ostream.close();
-                }
-                if (fstream != null) {
-                    fstream.close();
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 

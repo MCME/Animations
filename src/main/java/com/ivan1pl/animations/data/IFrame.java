@@ -28,6 +28,4 @@ public interface IFrame {
     Selection toSelection();
 
     Location getCenter();
-
-    boolean isOutdated();
 }

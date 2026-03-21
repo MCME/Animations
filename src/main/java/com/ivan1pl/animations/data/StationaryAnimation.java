@@ -20,9 +20,6 @@ package com.ivan1pl.animations.data;
 
 import com.ivan1pl.animations.exceptions.InvalidSelectionException;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -33,9 +30,7 @@ import org.bukkit.entity.Player;
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public class StationaryAnimation extends Animation implements Serializable {
-
-    private static final long serialVersionUID = -3315164220067048965L;
+public class StationaryAnimation extends Animation {
 
     private final List<IFrame> frames = new ArrayList<>();
 
@@ -118,19 +113,6 @@ public class StationaryAnimation extends Animation implements Serializable {
     }
 
     @Override
-    public void saveTo(File folder, ObjectOutputStream out) throws IOException {
-        super.saveTo(folder, out);
-        if (frames.size() > 0 && frames.get(0) instanceof MCMEStoragePlotFrame) {
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-            for (int i = 0; i < frames.size(); i++) {
-                ((MCMEStoragePlotFrame) frames.get(i)).save(new File(folder, "frame_" + i + ".mcme"));
-            }
-        }
-    }
-
-    @Override
     public boolean prepare(File folder) {
         if (!folder.exists()) {
             folder.mkdir();
@@ -139,17 +121,6 @@ public class StationaryAnimation extends Animation implements Serializable {
             IFrame frame = frames.get(i);
             if (frame instanceof MCMEStoragePlotFrame) {
                 ((MCMEStoragePlotFrame) frame).load(new File(folder, "frame_" + i + ".mcme"));
-            }
-            if (frame instanceof BlockIdFrame) {
-                ((BlockIdFrame) frame).init();
-            }
-        }
-        for (int i = 0; i < frames.size(); i++) {
-            IFrame frame = frames.get(i);
-            if (frame instanceof BlockIdFrame) {
-                MCMEStoragePlotFrame update = MCMEStoragePlotFrame.fromSelection(frame.toSelection());
-                update.setBlocks(((BlockIdFrame) frame).getBlockMaterials());
-                frames.set(i, update);
             }
         }
         return true;
@@ -165,14 +136,12 @@ public class StationaryAnimation extends Animation implements Serializable {
         config.set("AnimationType", AnimationType.STATIONARY.name());
         selection.save(config);
         config.set("Frames", frames.size());
-        // ConfigurationSection frameSection = config.createSection("Frames");
         if (frames.size() > 0 && frames.get(0) instanceof MCMEStoragePlotFrame) {
             if (!folder.exists()) {
                 folder.mkdir();
             }
             for (int i = 0; i < frames.size(); i++) {
                 ((MCMEStoragePlotFrame) frames.get(i)).save(new File(folder, "frame_" + i + ".mcme"));
-                // ((MCMEStoragePlotFrame)frames.get(i)).save(""+i, frameSection);
             }
         }
     }

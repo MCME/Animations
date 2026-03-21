@@ -21,9 +21,6 @@ package com.ivan1pl.animations.data;
 import com.ivan1pl.animations.tasks.AnimationTask;
 import com.ivan1pl.animations.triggers.TriggerBuilderData;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -34,9 +31,7 @@ import org.bukkit.entity.Player;
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public abstract class Animation implements Serializable {
-
-    private static final long serialVersionUID = -7839198751291994315L;
+public abstract class Animation {
 
     private String name;
 
@@ -101,10 +96,6 @@ public abstract class Animation implements Serializable {
                 }
             }
         }
-    }
-
-    public void saveTo(File folder, ObjectOutputStream out) throws IOException {
-        out.writeObject(this);
     }
 
     public abstract boolean prepare(File folder);

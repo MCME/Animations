@@ -20,7 +20,6 @@ package com.ivan1pl.animations.triggers;
 
 import com.ivan1pl.animations.constants.MouseButton;
 import com.ivan1pl.animations.data.AnimationsLocation;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,9 +30,7 @@ import org.bukkit.configuration.ConfigurationSection;
  * When animation is loaded it will use it to create a trigger.
  * @author Ivan1pl
  */
-public class TriggerBuilderData implements Serializable {
-
-    private static final long serialVersionUID = -955742584558670327L;
+public class TriggerBuilderData {
 
     private final TriggerType type;
     private final int range;

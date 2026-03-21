@@ -18,8 +18,6 @@
  */
 package com.ivan1pl.animations.data;
 
-import com.sk89q.worldedit.Vector;
-import java.io.Serializable;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,9 +28,7 @@ import org.bukkit.configuration.ConfigurationSection;
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public class AnimationsLocation implements Serializable {
-
-    private static final long serialVersionUID = 5482328410797364959L;
+public class AnimationsLocation {
 
     private double x;
     private double y;
@@ -88,10 +84,6 @@ public class AnimationsLocation implements Serializable {
                 && l1.getBlockX() == l2.getBlockX()
                 && l1.getBlockY() == l2.getBlockY()
                 && l1.getBlockZ() == l2.getBlockZ();
-    }
-
-    public Vector getVector() {
-        return new Vector(x, y, z);
     }
 
     public double getX() {

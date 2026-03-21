@@ -22,23 +22,16 @@ import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.exceptions.InvalidSelectionException;
 import com.ivan1pl.animations.utils.SerializationUtils;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-// import org.apache.commons.lang3.SerializationUtils;
-
 /**
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public class MovingAnimation extends Animation implements Serializable {
-
-    private static final long serialVersionUID = -3124628769457473325L;
+public class MovingAnimation extends Animation {
 
     private IFrame frame;
 
@@ -120,23 +113,6 @@ public class MovingAnimation extends Animation implements Serializable {
     }
 
     @Override
-    public void saveTo(File folder, ObjectOutputStream out) throws IOException {
-        super.saveTo(folder, out);
-        if (background instanceof MCMEStoragePlotFrame) {
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-            ((MCMEStoragePlotFrame) background).save(new File(folder, "background.mcme"));
-        }
-        if (frame instanceof MCMEStoragePlotFrame) {
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-            ((MCMEStoragePlotFrame) frame).save(new File(folder, "frame.mcme"));
-        }
-    }
-
-    @Override
     public boolean prepare(File folder) {
         if (!folder.exists()) {
             folder.mkdir();
@@ -146,22 +122,6 @@ public class MovingAnimation extends Animation implements Serializable {
         }
         if (frame instanceof MCMEStoragePlotFrame) {
             ((MCMEStoragePlotFrame) frame).load(new File(folder, "frame.mcme"));
-        }
-        if (background instanceof BlockIdFrame) {
-            ((BlockIdFrame) background).init();
-        }
-        if (frame instanceof BlockIdFrame) {
-            ((BlockIdFrame) frame).init();
-        }
-        if (background instanceof BlockIdFrame) {
-            MCMEStoragePlotFrame update = MCMEStoragePlotFrame.fromSelection(background.toSelection());
-            update.setBlocks(((BlockIdFrame) background).getBlockMaterials());
-            background = update;
-        }
-        if (frame instanceof BlockIdFrame) {
-            MCMEStoragePlotFrame update = MCMEStoragePlotFrame.fromSelection(frame.toSelection());
-            update.setBlocks(((BlockIdFrame) frame).getBlockMaterials());
-            frame = update;
         }
         return true;
     }

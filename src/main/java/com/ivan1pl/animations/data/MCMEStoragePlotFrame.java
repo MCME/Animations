@@ -44,11 +44,9 @@ import org.bukkit.util.Vector;
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public class MCMEStoragePlotFrame implements Serializable, IFrame, IStoragePlot {
+public class MCMEStoragePlotFrame implements IFrame, IStoragePlot {
 
-    private static final long serialVersionUID = 1L;
-
-    private transient byte[] frameNBTData;
+    private byte[] frameNBTData;
 
     private int sizeX;
     private int sizeY;
@@ -58,11 +56,6 @@ public class MCMEStoragePlotFrame implements Serializable, IFrame, IStoragePlot 
     private int z;
 
     private String worldName;
-
-    @Override
-    public boolean isOutdated() {
-        return false;
-    }
 
     @Override
     public void show() {

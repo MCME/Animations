@@ -3,8 +3,7 @@ main: com.ivan1pl.animations.AnimationsPlugin
 version: ${project.version}
 description: Animations plugin
 load: POSTWORLD
-# Q: Remove bukkit?
-softdepend: [worldedit-bukkit, bukkit, PluginUtils]
+softdepend: [PluginUtils]
 api-version: 1.21
 # Q: Delete this? Keep it so you don't need luckperms setup?
 permissions:
