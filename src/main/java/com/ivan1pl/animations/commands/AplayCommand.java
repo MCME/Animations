@@ -41,7 +41,8 @@ public class AplayCommand {
                 .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_USER))
                 .then(Commands.argument("name", StringArgumentType.word())
                         .suggests((ctx, builder) -> {
-                            for (String name : Animations.getAnimationNames()) builder.suggest(name);
+                            for (String name : Animations.getFilteredAnimationNames(builder.getRemainingLowerCase()))
+                                builder.suggest(name);
                             return builder.buildFuture();
                         })
                         .executes(ctx -> {

@@ -60,6 +60,8 @@ public class Animations {
 
     private static final int PAGE_SIZE = 10;
 
+    private static final int SUGGESTION_LIMIT = 50;
+
     private static boolean debugMode = false;
 
     private static int editorTimeout;
@@ -315,6 +317,28 @@ public class Animations {
     public static String[] getAnimationNames() {
         Set<String> names = animations.keySet();
         return names.toArray(new String[names.size()]);
+    }
+
+    public static List<String> getFilteredAnimationNames(String searchTerm) {
+        return animations.keySet().stream()
+                .filter(name -> matchesAnimationFilter(name, searchTerm))
+                .limit(SUGGESTION_LIMIT)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    private static boolean matchesAnimationFilter(String name, String searchTerm) {
+        if (searchTerm.isEmpty()) return true;
+        String[] parts = name.toLowerCase().split("-");
+        int partsLength = parts.length;
+
+        // segment = world-project-name, project-name, name
+        for (int i = 0; i < partsLength; i++) {
+            String segment = String.join("-", Arrays.copyOfRange(parts, i, partsLength));
+            if (segment.startsWith(searchTerm)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Material getWandMaterial() {
