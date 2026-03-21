@@ -1,23 +1,7 @@
-name: ${project.artifactId}
+name: ${name}
 main: com.ivan1pl.animations.AnimationsPlugin
-version: ${project.version}
+version: ${version}
 description: Animations plugin
 load: POSTWORLD
 softdepend: [PluginUtils]
 api-version: 1.21
-# Q: Delete this? Keep it so you don't need luckperms setup?
-permissions:
-    animations.*:
-        description: Gives access to all animations commands.
-        default: op
-        children:
-            animations.admin: true
-            animations.user: true
-    animations.admin:
-        description: Allows to create, remove and edit animations.
-        default: op
-        children:
-            animations.user: true
-    animations.user:
-        description: Allows to play animations.
-        default: op
