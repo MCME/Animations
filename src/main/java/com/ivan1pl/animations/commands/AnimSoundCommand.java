@@ -19,15 +19,14 @@
 package com.ivan1pl.animations.commands;
 
 import com.ivan1pl.animations.constants.Messages;
+import com.ivan1pl.animations.constants.Permissions;
 import com.ivan1pl.animations.constants.SoundPlayMode;
 import com.ivan1pl.animations.conversations.SelectSoundConversationPrompt;
 import com.ivan1pl.animations.data.Animation;
-import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.data.SoundData;
 import com.ivan1pl.animations.utils.MessageUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -41,9 +40,11 @@ public class AnimSoundCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> subcommand() {
         return Commands.literal("sound")
-                .then(setSubcommand())
-                .then(removeSubcommand())
-                .then(infoSubcommand());
+                .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
+                .then(Commands.argument("name", AnimationArgumentType.animation())
+                        .then(setSubcommand())
+                        .then(removeSubcommand())
+                        .then(infoSubcommand()));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> setSubcommand() {
@@ -58,26 +59,17 @@ public class AnimSoundCommand {
                                 // "In Java Edition, values less than 0.5 are equivalent to 0.5"
                                 .then(Commands.argument("pitch", IntegerArgumentType.integer(50, 200))
                                         .then(Commands.literal("begin")
-                                                .executes(ctx -> executeAdd(ctx, SoundPlayMode.BEGIN)))
+                                                .executes(ctx -> executeSet(ctx, SoundPlayMode.BEGIN)))
                                         .then(Commands.literal("end")
-                                                .executes(ctx -> executeAdd(ctx, SoundPlayMode.END)))
+                                                .executes(ctx -> executeSet(ctx, SoundPlayMode.END)))
                                         .then(Commands.literal("all")
-                                                .executes(ctx -> executeAdd(ctx, SoundPlayMode.ALL_FRAMES))))));
+                                                .executes(ctx -> executeSet(ctx, SoundPlayMode.ALL_FRAMES))))));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> removeSubcommand() {
         return Commands.literal("remove").executes(ctx -> {
-            CommandSender sender = ctx.getSource().getSender();
-
-            String name = StringArgumentType.getString(ctx, "name");
-            Animation animation = Animations.getAnimation(name);
-            if (animation == null) {
-                MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
-                return 0;
-            }
-
-            animation.setSoundData(null);
-            MessageUtil.sendInfoMessage(sender, Messages.MSG_SOUND_REMOVE_SUCCESS);
+            AnimationArgumentType.getAnimation(ctx, "name").setSoundData(null);
+            MessageUtil.sendInfoMessage(ctx.getSource().getSender(), Messages.MSG_SOUND_REMOVE_SUCCESS);
             return Command.SINGLE_SUCCESS;
         });
     }
@@ -85,15 +77,7 @@ public class AnimSoundCommand {
     private static LiteralArgumentBuilder<CommandSourceStack> infoSubcommand() {
         return Commands.literal("info").executes(ctx -> {
             CommandSender sender = ctx.getSource().getSender();
-
-            String name = StringArgumentType.getString(ctx, "name");
-            Animation animation = Animations.getAnimation(name);
-            if (animation == null) {
-                MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
-                return 0;
-            }
-
-            SoundData sd = animation.getSoundData();
+            SoundData sd = AnimationArgumentType.getAnimation(ctx, "name").getSoundData();
             if (sd == null) {
                 MessageUtil.sendInfoMessage(sender, Messages.MSG_SOUND_NOT_SET);
             } else {
@@ -104,26 +88,20 @@ public class AnimSoundCommand {
         });
     }
 
-    private static int executeAdd(CommandContext<CommandSourceStack> ctx, SoundPlayMode mode) {
+    private static int executeSet(CommandContext<CommandSourceStack> ctx, SoundPlayMode mode) {
         CommandSender sender = ctx.getSource().getSender();
         if (!(sender instanceof Player player)) {
             MessageUtil.sendErrorMessage(sender, Messages.MSG_PLAYER_ONLY);
             return 0;
         }
 
-        String name = StringArgumentType.getString(ctx, "name");
-        Animation animation = Animations.getAnimation(name);
-        if (animation == null) {
-            MessageUtil.sendErrorMessage(sender, Messages.MSG_ANIMATION_NOT_FOUND, name);
-            return 0;
-        }
-
+        Animation animation = AnimationArgumentType.getAnimation(ctx, "name");
         NamespacedKey soundKey = ctx.getArgument("sound", NamespacedKey.class);
-        int radius = IntegerArgumentType.getInteger(ctx, "block_radius");
+        int radius = IntegerArgumentType.getInteger(ctx, "block-radius");
         int pitch = IntegerArgumentType.getInteger(ctx, "pitch");
 
         // Volume specifies the distance that the sound can be heard, default: 1 - a 16 block radius
-        // The animation plugin stores volume x100 (to avoid floating point I think)
+        // The animation plugin stores volume x100 (to avoid floating point)
         int volume = Math.round(radius * 100.0f / 16);
 
         SoundData sd = new SoundData();

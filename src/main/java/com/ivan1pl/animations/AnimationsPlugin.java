@@ -18,10 +18,7 @@
  */
 package com.ivan1pl.animations;
 
-import com.ivan1pl.animations.commands.AdeleteCommand;
-import com.ivan1pl.animations.commands.AlistCommand;
 import com.ivan1pl.animations.commands.AnimCommand;
-import com.ivan1pl.animations.commands.AplayCommand;
 import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.conversations.EditAnimationConversationFactory;
 import com.ivan1pl.animations.data.Animations;
@@ -47,9 +44,6 @@ public class AnimationsPlugin extends JavaPlugin {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             final Commands registrar = commands.registrar();
             registrar.register(AnimCommand.command().build());
-            registrar.register(AplayCommand.command().build());
-            registrar.register(AlistCommand.command().build());
-            registrar.register(AdeleteCommand.command().build());
         });
 
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
