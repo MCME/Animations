@@ -23,7 +23,6 @@ import com.ivan1pl.animations.triggers.TriggerBuilderData;
 import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -90,7 +89,7 @@ public abstract class Animation {
                     // "+Sound.valueOf(soundData.getName()));
                     p.playSound(
                             getCenter(),
-                            Sound.valueOf(soundData.getName()),
+                            soundData.getName(),
                             soundData.getVolume() / 100.f,
                             soundData.getPitch() / 100.f);
                 }

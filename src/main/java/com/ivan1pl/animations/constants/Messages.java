@@ -162,6 +162,14 @@ public class Messages {
 
     public static final String NOSOUND_INFO = "Sound: none";
 
+    public static final String MSG_SOUND_ADD_SUCCESS = "Sound ''{0}'' added (plays on {1}). Don''t forget to save.";
+
+    public static final String MSG_SOUND_REMOVE_SUCCESS = "Sound removed. Don''t forget to save.";
+
+    public static final String MSG_SOUND_NOT_SET = "No sound is configured for this animation.";
+
+    public static final String MSG_SOUND_INFO = "Sound: {0}; plays on {1}; radius = {2} blocks; pitch = {3}";
+
     public static final String TRIGGER_INFO = "Trigger: type: {0}, range: {1}.";
 
     public static final String TRIGGER_NORANGE_INFO = "Trigger: type: {0}.";

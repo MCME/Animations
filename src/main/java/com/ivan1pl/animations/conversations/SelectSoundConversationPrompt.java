@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
-
+import java.util.stream.Collectors;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
@@ -153,5 +153,13 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
 
     private boolean isValidPage(int page) {
         return page > 0 && page <= pageCount;
+    }
+
+    public static List<String> getFilteredSounds(String prefix) {
+        String lower = prefix.toLowerCase();
+        return sounds.stream()
+                .filter(str -> str.contains(lower))
+                .limit(PAGE_SIZE)
+                .collect(Collectors.toList());
     }
 }

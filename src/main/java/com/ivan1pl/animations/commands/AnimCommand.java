@@ -57,6 +57,7 @@ public class AnimCommand {
                                     .getConversationFactory()
                                     .startConversation(player, name);
                             return Command.SINGLE_SUCCESS;
-                        }));
+                        })
+                        .then(AnimSoundCommand.subcommand()));
     }
 }
