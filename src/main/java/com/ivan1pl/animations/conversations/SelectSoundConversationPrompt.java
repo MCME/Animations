@@ -23,6 +23,13 @@ import com.ivan1pl.animations.data.Animation;
 import com.ivan1pl.animations.data.SoundData;
 import com.ivan1pl.animations.utils.MessageUtil;
 import com.ivan1pl.animations.utils.StringUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringJoiner;
+
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
@@ -33,29 +40,26 @@ import org.bukkit.conversations.Prompt;
  */
 public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
 
-    private static final String[] sounds;
-
+    private static final List<String> sounds;
     private static final int PAGE_SIZE = 50;
-
     private static final int pageCount;
 
     private final Prompt retPrompt;
-
     private final Animation animation;
-
     private final SoundData soundData;
 
     static {
-        Sound[] s = Sound.values();
-        sounds = new String[s.length];
-        for (int i = 0; i < s.length; ++i) {
-            sounds[i] = s[i].name();
+        List<String> soundList = new ArrayList<>();
+        for (Sound sound : Registry.SOUNDS) {
+            NamespacedKey key = Registry.SOUNDS.getKey(sound);
+            if (key != null) {
+                soundList.add(key.toString());
+            }
         }
-        int pc = sounds.length / PAGE_SIZE;
-        if (sounds.length % PAGE_SIZE != 0) {
-            pc++;
-        }
-        pageCount = pc;
+        Collections.sort(soundList);
+        sounds = Collections.unmodifiableList(soundList);
+
+        pageCount = (sounds.size() + PAGE_SIZE - 1) / PAGE_SIZE;
     }
 
     public SelectSoundConversationPrompt(Prompt retPrompt, Animation animation, SoundData soundData) {
@@ -105,15 +109,12 @@ public class SelectSoundConversationPrompt extends BaseEditorValidatingPrompt {
 
     private Prompt displayPage(int page) {
         int startIndex = (page - 1) * PAGE_SIZE;
-        int stopIndex = Math.min(page * PAGE_SIZE - 1, sounds.length - 1);
-        String soundList = "";
+        int stopIndex = Math.min(page * PAGE_SIZE - 1, sounds.size() - 1);
+        StringJoiner joiner = new StringJoiner(", ");
         for (int i = startIndex; i <= stopIndex; ++i) {
-            if (soundList.length() == 0) {
-                soundList = sounds[i];
-            } else {
-                soundList = soundList + ", " + sounds[i];
-            }
+            joiner.add(sounds.get(i));
         }
+        String soundList = joiner.toString();
         return new ConversationResponsePrompt(
                 this, MessageUtil.formatInfoMessage(Messages.MSG_SOUND_LIST, page, pageCount, soundList));
     }
