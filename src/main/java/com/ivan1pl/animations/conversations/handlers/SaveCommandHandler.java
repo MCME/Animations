@@ -46,16 +46,12 @@ public class SaveCommandHandler extends ConversationCommandHandler {
             throws AnimationTypeException {
         animation.stop();
         OperationResult result = Animations.saveAnimation(animationName);
-        String message = "";
-        switch (result) {
-            case SUCCESS:
-                message = MessageUtil.formatInfoMessage(Messages.MSG_ANIMATION_SAVED);
-                break;
-            case INTERNAL_ERROR:
-            case NOT_FOUND:
-                message = MessageUtil.formatErrorMessage(Messages.MSG_SAVE_FAILED, animationName);
-                break;
-        }
+        String message =
+                switch (result) {
+                    case SUCCESS -> MessageUtil.formatInfoMessage(Messages.MSG_ANIMATION_SAVED);
+                    case INTERNAL_ERROR, NOT_FOUND ->
+                        MessageUtil.formatErrorMessage(Messages.MSG_SAVE_FAILED, animationName);
+                };
         return new ConversationResponsePrompt(successPrompt, message);
     }
 }

@@ -46,6 +46,6 @@ public class IntervalCommandHandler extends ConversationCommandHandler {
         animation.stop();
         animation.setInterval(interval);
         return new ConversationResponsePrompt(
-                successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_INTERVAL_SET, new Long(interval)));
+                successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_INTERVAL_SET, (long) interval));
     }
 }

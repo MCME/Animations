@@ -60,9 +60,8 @@ public class SwapframesCommandHandler extends ConversationCommandHandler {
                     successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_FRAMES_SWAPPED));
         } else {
             return new ConversationResponsePrompt(
-                    failPrompt,
-                    MessageUtil.formatErrorMessage(
-                            Messages.MSG_WRONG_FRAME_INDEX, new Long(0), new Long(sAnimation.getFrameCount() - 1)));
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_WRONG_FRAME_INDEX, 0L, (long)
+                            (sAnimation.getFrameCount() - 1)));
         }
     }
 }
