@@ -65,8 +65,6 @@ public class EditAnimationConversationPrompt extends BaseEditorValidatingPrompt 
         STATIONARY_EDIT_COMMANDS.add(new HelpCommandHandler(this));
         STATIONARY_EDIT_COMMANDS.add(new TriggerCommandHandler(this, this));
         STATIONARY_EDIT_COMMANDS.add(new DeletetriggerCommandHandler(this));
-        STATIONARY_EDIT_COMMANDS.add(new SoundCommandHandler(this));
-        STATIONARY_EDIT_COMMANDS.add(new DeletesoundCommandHandler(this));
         STATIONARY_EDIT_COMMANDS.add(new CancelCommandHandler(END_OF_CONVERSATION));
         STATIONARY_EDIT_COMMANDS.add(new SaveCommandHandler(this));
 
@@ -78,8 +76,6 @@ public class EditAnimationConversationPrompt extends BaseEditorValidatingPrompt 
         MOVING_EDIT_COMMANDS.add(new HelpCommandHandler(this));
         MOVING_EDIT_COMMANDS.add(new TriggerCommandHandler(this, this));
         MOVING_EDIT_COMMANDS.add(new DeletetriggerCommandHandler(this));
-        MOVING_EDIT_COMMANDS.add(new SoundCommandHandler(this));
-        MOVING_EDIT_COMMANDS.add(new DeletesoundCommandHandler(this));
         MOVING_EDIT_COMMANDS.add(new CancelCommandHandler(END_OF_CONVERSATION));
         MOVING_EDIT_COMMANDS.add(new SaveCommandHandler(this));
     }

@@ -42,8 +42,9 @@ public class AnimCommand {
         return Commands.literal("anim")
                 .then(Commands.literal("create")
                         .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
-                        .then(Commands.argument("name", StringArgumentType.word())
-                                .executes(ctx -> openEditor(ctx, StringArgumentType.getString(ctx, "name")))))
+                        .then(Commands.argument("world-project-name", StringArgumentType.word())
+                                .executes(ctx ->
+                                        openEditor(ctx, StringArgumentType.getString(ctx, "world-project-name")))))
                 .then(Commands.literal("edit")
                         .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
                         .then(Commands.argument("name", AnimationArgumentType.animation())

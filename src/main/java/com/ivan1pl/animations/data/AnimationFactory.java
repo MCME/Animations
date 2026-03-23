@@ -18,7 +18,7 @@ public class AnimationFactory {
                         case STATIONARY -> StationaryAnimation.load(config);
                         case MOVING -> MovingAnimation.load(config);
                     };
-            animation.setName(file.getParent());
+            animation.setName(file.getParentFile().getName());
             return animation;
         } catch (IOException | InvalidConfigurationException | InvalidSelectionException e) {
             e.printStackTrace();

@@ -28,8 +28,6 @@ public class Messages {
 
     public static final String MSG_WRONG_FRAME_INDEX = "Frame index out of range. Index should be between {0} and {1}.";
 
-    public static final String MSG_ANIMATION_NOT_FOUND = "Could not find animation with name: {0}.";
-
     public static final String MSG_STATIONARY_ANIMATION_EDIT_INFO =
             "Editing {0}, {1} frames, interval = {2}. Available operations:\n{3}";
 
@@ -40,16 +38,13 @@ public class Messages {
             "Editing {0}, {1} frames, interval = {2}. For list of available operations, type ''help''.";
 
     public static final String MSG_MOVING_ANIMATION_EDIT_INFO_SIMPLE =
-            "Editing {0}, step: ({1}, {2}, {3}), maximum distance: {4}, interval = {5}. For list of available operations, type ''help''.";
-
-    public static final String MSG_NOT_PERMITTED = "You don't have permission to run this command.";
-
-    public static final String MSG_EXPECTED_MORE_ARGS = "Expected at least {0} arguments for this command.";
+            "Editing {0}, step: ({1}, {2}, {3}), maximum distance: {4}, interval = {5}. For list of available"
+                    + " operations, type ''help''.";
 
     public static final String MSG_CREATE_ANIMATION =
-            "Creating {0}. Select area using {1} and set type with ''type m'' (moving animation) or ''type s'' (default - stationary animation).\nConfirm by typing ''y'' or exit with ''cancel''";
-
-    public static final String MSG_ANIMATION_CREATED = "Animation {0} created.";
+            "Creating {0}. Select area using {1} and set type with ''type m'' (moving animation) or ''type s''"
+                    + " (default - stationary animation).\n"
+                    + "Confirm by typing ''y'' or exit with ''cancel''";
 
     public static final String MSG_SAVE_FAILED = "Failed to save animation: {0}.";
 
@@ -113,8 +108,9 @@ public class Messages {
 
     public static final String MSG_TRIGGER_DELETED = "Trigger deleted.";
 
-    public static final String MSG_EDIT_BLOCK_TRIGGER =
-            "Select a block with {0} and type:\n''l'' if the block should be clicked with left mouse button, ''r'' if the block should be clicked with right mouse button, ''b'' if both mouse buttons should be accepted or exit with ''c'',";
+    public static final String MSG_EDIT_BLOCK_TRIGGER = "Select a block with {0} and type:\n"
+            + "''l'' if the block should be clicked with left mouse button, ''r'' if the block should be clicked"
+            + " with right mouse button, ''b'' if both mouse buttons should be accepted or exit with ''c'',";
 
     public static final String MSG_EDIT_TRIGGER_CANCELLED = "Cancelled.";
 
@@ -138,42 +134,15 @@ public class Messages {
     public static final String MSG_SELECT_FRAME =
             "Select frame after which this animation will be triggered or exit with ''c''.";
 
-    public static final String MSG_SELECT_SOUND_CANCELLED = "Sound selection cancelled.";
-
-    public static final String MSG_SELECT_SOUND =
-            "Select sound with ''select <sound_name>'' or exit with ''cancel''. For list of available sounds, type ''list <page>''";
-
-    public static final String MSG_SOUND_SELECTED = "Sound selected.";
-
-    public static final String MSG_INVALID_SOUND = "Invalid sound name: {0}.";
-
-    public static final String MSG_INVALID_PAGE = "Invalid page number: {0}. Expected number between 1 and {1}.";
-
-    public static final String MSG_SOUND_LIST = "Displaying sound list, page {0}/{1}:\n{2}";
-
-    public static final String MSG_SELECT_SOUND_PLAY_MODE =
-            "When should the sound be played? (b - when animation begins, e - when animation ends, a - all frames, c - cancel)";
-
-    public static final String MSG_SOUND_UPDATED = "Sound updated.";
-
-    public static final String MSG_SOUND_DELETED = "Sound deleted.";
-
     public static final String SOUND_INFO = "Sound: {0}; {1}; range = {2}; pitch = {3}; volume = {4}";
-
     public static final String NOSOUND_INFO = "Sound: none";
-
-    public static final String MSG_SOUND_ADD_SUCCESS = "Sound ''{0}'' added (plays on {1}). Don''t forget to save.";
-
-    public static final String MSG_SOUND_REMOVE_SUCCESS = "Sound removed. Don''t forget to save.";
-
+    public static final String MSG_SOUND_ADD_SUCCESS = "Sound ''{0}'' added (plays on {1})";
+    public static final String MSG_SOUND_REMOVE_SUCCESS = "Sound removed";
     public static final String MSG_SOUND_NOT_SET = "No sound is configured for this animation.";
-
     public static final String MSG_SOUND_INFO = "Sound: {0}; plays on {1}; radius = {2} blocks; pitch = {3}";
 
     public static final String TRIGGER_INFO = "Trigger: type: {0}, range: {1}.";
-
     public static final String TRIGGER_NORANGE_INFO = "Trigger: type: {0}.";
-
     public static final String NOTRIGGER_INFO = "Trigger: none";
 
     public static final String INFO_ANIMATION_LOADED = "Animation loaded: ";
@@ -183,8 +152,6 @@ public class Messages {
     public static final String INFO_INVALID_MATERIAL = "Invalid material name: {0}. Using default ({1}).";
 
     public static final String DEBUG_COMMAND_EXECUTED = "''{0}'' is handling command executed by ''{1}''.";
-
     public static final String DEBUG_MOVING_ANIMATION_CHECKING_PLAYER = "''{0}'': checking player: ''{1}''.";
-
     public static final String DEBUG_MOVING_PLAYER = "''{0}'': found player to move: ''{1}''. Moving.";
 }

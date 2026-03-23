@@ -21,22 +21,44 @@ package com.ivan1pl.animations.commands;
 import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.constants.Permissions;
 import com.ivan1pl.animations.constants.SoundPlayMode;
-import com.ivan1pl.animations.conversations.SelectSoundConversationPrompt;
 import com.ivan1pl.animations.data.Animation;
+import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.data.SoundData;
 import com.ivan1pl.animations.utils.MessageUtil;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class AnimSoundCommand {
+
+    private static final int SUGGESTION_LIMIT = 50;
+    private static final List<String> sounds;
+
+    static {
+        List<String> soundList = new ArrayList<>();
+        for (Sound sound : Registry.SOUNDS) {
+            NamespacedKey key = Registry.SOUNDS.getKey(sound);
+            if (key != null) {
+                soundList.add(key.toString());
+            }
+        }
+        Collections.sort(soundList);
+        sounds = Collections.unmodifiableList(soundList);
+    }
 
     public static LiteralArgumentBuilder<CommandSourceStack> subcommand() {
         return Commands.literal("sound")
@@ -51,13 +73,12 @@ public class AnimSoundCommand {
         return Commands.literal("set")
                 .then(Commands.argument("sound", ArgumentTypes.namespacedKey())
                         .suggests((ctx, builder) -> {
-                            SelectSoundConversationPrompt.getFilteredSounds(builder.getRemainingLowerCase())
-                                    .forEach(builder::suggest);
+                            getFilteredSounds(builder.getRemainingLowerCase()).forEach(builder::suggest);
                             return builder.buildFuture();
                         })
-                        .then(Commands.argument("block-radius", IntegerArgumentType.integer(1))
+                        .then(Commands.argument("block-range", IntegerArgumentType.integer(1))
                                 // "In Java Edition, values less than 0.5 are equivalent to 0.5"
-                                .then(Commands.argument("pitch", IntegerArgumentType.integer(50, 200))
+                                .then(Commands.argument("pitch", FloatArgumentType.floatArg(0.5f, 2))
                                         .then(Commands.literal("begin")
                                                 .executes(ctx -> executeSet(ctx, SoundPlayMode.BEGIN)))
                                         .then(Commands.literal("end")
@@ -82,7 +103,12 @@ public class AnimSoundCommand {
                 MessageUtil.sendInfoMessage(sender, Messages.MSG_SOUND_NOT_SET);
             } else {
                 MessageUtil.sendInfoMessage(
-                        sender, Messages.MSG_SOUND_INFO, sd.getName(), sd.getPlayMode(), sd.getRange(), sd.getPitch());
+                        sender,
+                        Messages.MSG_SOUND_INFO,
+                        sd.getName(),
+                        sd.getPlayMode(),
+                        sd.getRange(),
+                        sd.getPitch() / 100f);
             }
             return Command.SINGLE_SUCCESS;
         });
@@ -97,23 +123,36 @@ public class AnimSoundCommand {
 
         Animation animation = AnimationArgumentType.getAnimation(ctx, "name");
         NamespacedKey soundKey = ctx.getArgument("sound", NamespacedKey.class);
-        int radius = IntegerArgumentType.getInteger(ctx, "block-radius");
-        int pitch = IntegerArgumentType.getInteger(ctx, "pitch");
+        int range = IntegerArgumentType.getInteger(ctx, "block-range");
+        float pitch = FloatArgumentType.getFloat(ctx, "pitch");
 
         // Volume specifies the distance that the sound can be heard, default: 1 - a 16 block radius
         // The animation plugin stores volume x100 (to avoid floating point)
-        int volume = Math.round(radius * 100.0f / 16);
+        int volume = Math.round(range * 100.0f / 16);
+
+        player.playSound(player.getLocation(), soundKey.toString(), volume / 100.f, pitch);
 
         SoundData sd = new SoundData();
         sd.setName(soundKey.toString());
-        sd.setRange(radius);
-        sd.setPitch(pitch); // "Values lower than 1 lower the pitch and increase the duration" vice versa
+        sd.setRange(range);
+        // "Values lower than 1 will lower the pitch and increase the duration" vice versa
+        sd.setPitch((int) (pitch * 100));
         sd.setVolume(volume);
         sd.setPlayMode(mode);
         animation.setSoundData(sd);
+        Animations.saveAnimation(animation.getName());
 
-        player.playSound(player.getLocation(), soundKey.toString(), volume / 100.f, pitch / 100.f);
         MessageUtil.sendInfoMessage(sender, Messages.MSG_SOUND_ADD_SUCCESS, soundKey, mode);
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static List<String> getFilteredSounds(String prefix) {
+        String lower = prefix.toLowerCase();
+        return sounds.stream()
+                // removing the minecraft namespace from suggestions
+                .map(s -> s.startsWith("minecraft:") ? s.substring("minecraft:".length()) : s)
+                .filter(s -> s.contains(lower))
+                .limit(SUGGESTION_LIMIT)
+                .collect(Collectors.toList());
     }
 }
