@@ -120,12 +120,19 @@ public class AnimationsLocation implements Serializable {
         section.set("X",x);
         section.set("Y",y);
         section.set("Z",z);
+        section.set("world", getWorld().getName());
     }
 
     public static AnimationsLocation load(String key, ConfigurationSection config) {
         ConfigurationSection section = config.getConfigurationSection(key);
         if(section != null) {
-            return new AnimationsLocation(Bukkit.getWorlds().get(0),
+            World world;
+            if(section.contains("world")) {
+                world = Bukkit.getWorld(section.getString("world","world"));
+            } else {
+                world = Bukkit.getWorlds().get(0);
+            }
+            return new AnimationsLocation(world,
                     section.getDouble("X"),
                     section.getDouble("Y"),
                     section.getDouble("Z"));
