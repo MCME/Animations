@@ -9,7 +9,10 @@ group = 'com.ivan1pl'
 version = '1.5'
 
 repositories {
-    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven {
+        name = "papermc"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
     mavenLocal()
     mavenCentral()
 }
@@ -28,8 +31,9 @@ java {
     }
 }
 
+// Dynamically adding the version to the paper plugin.yml
 processResources {
-    filesMatching(['plugin.yml', 'config.yml']) {
+    filesMatching('plugin.yml') {
         expand(name: project.name, version: project.version)
     }
 }
