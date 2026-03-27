@@ -24,10 +24,7 @@ package com.ivan1pl.animations.constants;
  */
 public class Permissions {
 
-    public static final String PERMISSION_USER = "animations.user";
-
     public static final String PERMISSION_ADMIN = "animations.admin";
 
     private Permissions() {}
-    ;
 }

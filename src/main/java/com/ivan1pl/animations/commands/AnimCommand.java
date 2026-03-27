@@ -40,20 +40,18 @@ public class AnimCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> command() {
         return Commands.literal("anim")
+                .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
                 .then(Commands.literal("create")
-                        .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
                         .then(Commands.argument("world-project-name", StringArgumentType.word())
                                 .executes(ctx ->
                                         openEditor(ctx, StringArgumentType.getString(ctx, "world-project-name")))))
                 .then(Commands.literal("edit")
-                        .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
                         .then(Commands.argument("name", AnimationArgumentType.animation())
                                 .executes(ctx -> openEditor(
                                         ctx,
                                         AnimationArgumentType.getAnimation(ctx, "name")
                                                 .getName()))))
                 .then(Commands.literal("delete")
-                        .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
                         .then(Commands.argument("name", AnimationArgumentType.animation())
                                 .executes(ctx -> {
                                     CommandSender sender = ctx.getSource().getSender();
@@ -69,7 +67,6 @@ public class AnimCommand {
                                     return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("play")
-                        .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_USER))
                         .then(Commands.argument("name", AnimationArgumentType.animation())
                                 .executes(ctx -> {
                                     AnimationArgumentType.getAnimation(ctx, "name")
@@ -77,7 +74,6 @@ public class AnimCommand {
                                     return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("list")
-                        .requires(src -> src.getSender().hasPermission(Permissions.PERMISSION_ADMIN))
                         .executes(ctx -> executeList(ctx.getSource().getSender(), 1))
                         .then(Commands.argument("page", IntegerArgumentType.integer(1))
                                 .executes(ctx -> executeList(
