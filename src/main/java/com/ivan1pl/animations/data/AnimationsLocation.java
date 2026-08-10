@@ -18,6 +18,7 @@
  */
 package com.ivan1pl.animations.data;
 
+import java.io.Serializable;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,7 +29,12 @@ import org.bukkit.configuration.ConfigurationSection;
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public class AnimationsLocation {
+public class AnimationsLocation implements Serializable {
+
+    // Selection is deep-copied via Java serialization (SerializationUtils.clone), and it holds
+    // AnimationsLocation instances, so this must stay Serializable even though the legacy .anim
+    // format that first required it has been removed.
+    private static final long serialVersionUID = 5482328410797364959L;
 
     private double x;
     private double y;
