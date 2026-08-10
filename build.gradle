@@ -20,6 +20,25 @@ repositories {
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
     implementation 'com.mcmiddleearth:PluginUtils:1.9.1'
+
+    testImplementation platform('org.junit:junit-bom:6.0.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Paper API is needed on the test classpath for the org.bukkit types the data classes
+    // reference; the tests exercise pure logic and never start a server. (A MockBukkit
+    // server was tried but cannot construct the plot-storage frames: PluginUtils reads
+    // Chunk#getTileEntities, which MockBukkit leaves unimplemented.)
+    testImplementation 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+}
+
+// PluginUtils pulls in dynmap-api, which drags the ancient org.bukkit:bukkit:1.7.10.
+// On the test classpath that collides with paper-api's bukkit capability, so drop the
+// legacy jar here (paper-api provides a superset of the org.bukkit API).
+configurations.testCompileClasspath {
+    exclude group: 'org.bukkit', module: 'bukkit'
+}
+configurations.testRuntimeClasspath {
+    exclude group: 'org.bukkit', module: 'bukkit'
 }
 
 // https://docs.gradle.org/current/dsl/org.gradle.api.plugins.JavaPluginExtension.html
@@ -46,6 +65,10 @@ jar {
 
 shadowJar {
     archiveClassifier = "" // Removes -all from the end of the generated JAR
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks {
