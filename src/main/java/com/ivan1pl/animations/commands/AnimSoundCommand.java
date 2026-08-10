@@ -89,7 +89,9 @@ public class AnimSoundCommand {
 
     private static LiteralArgumentBuilder<CommandSourceStack> removeSubcommand() {
         return Commands.literal("remove").executes(ctx -> {
-            AnimationArgumentType.getAnimation(ctx, "name").setSoundData(null);
+            Animation animation = AnimationArgumentType.getAnimation(ctx, "name");
+            animation.setSoundData(null);
+            Animations.saveAnimation(animation.getName());
             MessageUtil.sendInfoMessage(ctx.getSource().getSender(), Messages.MSG_SOUND_REMOVE_SUCCESS);
             return Command.SINGLE_SUCCESS;
         });
