@@ -193,12 +193,21 @@ public class MovingAnimation extends Animation {
         animation.setStepZ(config.getInt("StepZ", 0));
         animation.setMaxDistance(config.getInt("MaxDistance", 0));
         animation.frame = MCMEStoragePlotFrame.fromSelection(animation.getSelection(), true);
-        Selection backgroundSelection = SerializationUtils.clone(animation.selection);
-        backgroundSelection.expand(
-                animation.stepX * animation.getFrameCount(),
-                animation.stepY * animation.getFrameCount(),
-                animation.stepZ * animation.getFrameCount());
+        Selection backgroundSelection = expandedBackgroundSelection(
+                animation.selection, animation.stepX, animation.stepY, animation.stepZ, animation.getFrameCount());
         animation.background = MCMEStoragePlotFrame.fromSelection(backgroundSelection, true);
         return animation;
+    }
+
+    /**
+     * Builds the (larger) background selection from the frame selection. The frame selection
+     * must be left untouched: {@link Selection#expand} mutates in place, so this clones first.
+     * Aliasing the stored selection here used to grow it by {@code step * frameCount} on every
+     * load/save cycle (audit finding H5).
+     */
+    static Selection expandedBackgroundSelection(Selection selection, int stepX, int stepY, int stepZ, int frameCount) {
+        Selection expanded = SerializationUtils.clone(selection);
+        expanded.expand(stepX * frameCount, stepY * frameCount, stepZ * frameCount);
+        return expanded;
     }
 }
