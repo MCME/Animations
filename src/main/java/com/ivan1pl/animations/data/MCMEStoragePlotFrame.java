@@ -178,15 +178,8 @@ public class MCMEStoragePlotFrame implements IFrame, IStoragePlot {
     }
 
     public void load(File file) {
-        try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new FileInputStream(file)));
-                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            int readBytes;
-            do {
-                readBytes = in.read(buffer, 0, buffer.length);
-                out.write(buffer, 0, readBytes);
-            } while (readBytes == buffer.length);
-            frameNBTData = out.toByteArray();
+        try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+            frameNBTData = in.readAllBytes();
         } catch (IOException ex) {
             Logger.getLogger(MCMEStoragePlotFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
