@@ -193,7 +193,7 @@ public class MovingAnimation extends Animation {
         animation.setStepZ(config.getInt("StepZ", 0));
         animation.setMaxDistance(config.getInt("MaxDistance", 0));
         animation.frame = MCMEStoragePlotFrame.fromSelection(animation.getSelection(), true);
-        Selection backgroundSelection = animation.selection;
+        Selection backgroundSelection = SerializationUtils.clone(animation.selection);
         backgroundSelection.expand(
                 animation.stepX * animation.getFrameCount(),
                 animation.stepY * animation.getFrameCount(),
