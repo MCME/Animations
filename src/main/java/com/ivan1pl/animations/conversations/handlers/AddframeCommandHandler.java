@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,24 +33,24 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class AddframeCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     public AddframeCommandHandler(Prompt successPrompt) {
         super("addframe", 0);
         this.successPrompt = successPrompt;
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation instanceof MovingAnimation) {
             throw new AnimationTypeException();
         }
         StationaryAnimation sAnimation = (StationaryAnimation) animation;
-        
+
         sAnimation.stop();
         sAnimation.addFrame();
         return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_FRAME_ADDED));
     }
-    
 }

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +33,11 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class MaxDistanceCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     private final Prompt failPrompt;
-    
+
     public MaxDistanceCommandHandler(Prompt successPrompt, Prompt failPrompt) {
         super("maxdistance", 1, "distance");
         this.successPrompt = successPrompt;
@@ -45,21 +45,23 @@ public class MaxDistanceCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation instanceof StationaryAnimation) {
             throw new AnimationTypeException();
         }
-        
+
         MovingAnimation mAnimation = (MovingAnimation) animation;
-        
+
         int d = Integer.parseInt(params[1]);
         mAnimation.stop();
         if (d == 0) {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_MAX_DISTANCE, d));
+            return new ConversationResponsePrompt(
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_MAX_DISTANCE, d));
         } else {
             mAnimation.setMaxDistance(d);
-            return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_MAX_DISTANCE_SET, d));
+            return new ConversationResponsePrompt(
+                    successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_MAX_DISTANCE_SET, d));
         }
     }
-    
 }

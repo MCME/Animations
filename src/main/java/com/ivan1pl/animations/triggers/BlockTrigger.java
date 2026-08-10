@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -34,11 +34,11 @@ import org.bukkit.inventory.EquipmentSlot;
  * @author Ivan1pl
  */
 public class BlockTrigger extends BaseRangeTrigger {
-    
+
     private final AnimationsLocation triggerBlock;
-    
+
     private final MouseButton triggerButton;
-    
+
     public BlockTrigger(Animation animation, AnimationsLocation triggerBlock, MouseButton triggerButton) {
         super(animation);
         this.triggerBlock = triggerBlock;
@@ -51,38 +51,45 @@ public class BlockTrigger extends BaseRangeTrigger {
             startReverseAnimation();
         }
     }
-    
+
     @Override
     public void execute() {
         if (isAnyPlayerInRange() && !isStarted() && !isFinished()) {
             startAnimation();
         }
     }
-    
+
     private boolean checkAction(Action action) {
-        if (null != triggerButton) return switch (triggerButton) {
-            case BOTH -> action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK;
-            case LEFT -> action == Action.LEFT_CLICK_BLOCK;
-            case RIGHT -> action == Action.RIGHT_CLICK_BLOCK;
-        };
+        if (null != triggerButton)
+            return switch (triggerButton) {
+                case BOTH -> action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK;
+                case LEFT -> action == Action.LEFT_CLICK_BLOCK;
+                case RIGHT -> action == Action.RIGHT_CLICK_BLOCK;
+            };
         return false;
     }
-    
+
     @EventHandler
     public void onPlayerInteractBlock(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (event.isCancelled() || event.getHand() != EquipmentSlot.HAND
-                || !isPlayerInRange(player) || !checkAction(event.getAction()) ||
-                (player.hasPermission(Permissions.PERMISSION_ADMIN)
-                && (player.getInventory().getItemInMainHand().getType().equals(Animations.getWandMaterial()) ||
-                    player.getInventory().getItemInMainHand().getType().equals(Animations.getBlockSelectorMaterial())))) {
+        if (event.isCancelled()
+                || event.getHand() != EquipmentSlot.HAND
+                || !isPlayerInRange(player)
+                || !checkAction(event.getAction())
+                || (player.hasPermission(Permissions.PERMISSION_ADMIN)
+                        && (player.getInventory().getItemInMainHand().getType().equals(Animations.getWandMaterial())
+                                || player.getInventory()
+                                        .getItemInMainHand()
+                                        .getType()
+                                        .equals(Animations.getBlockSelectorMaterial())))) {
             return;
         }
-        
-        if (AnimationsLocation.isSameBlock(triggerBlock, AnimationsLocation.fromLocation(event.getClickedBlock().getLocation()))) {
+
+        if (AnimationsLocation.isSameBlock(
+                triggerBlock,
+                AnimationsLocation.fromLocation(event.getClickedBlock().getLocation()))) {
             event.setCancelled(true);
             execute();
         }
     }
-    
 }

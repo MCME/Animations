@@ -52,11 +52,13 @@ public class SelectFrameConversationPrompt extends BaseEditorValidatingPrompt {
     @Override
     protected Prompt acceptValidatedInput(ConversationContext cc, String string) {
         if ("c".equalsIgnoreCase(string)) {
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
         } else {
             triggerBuilder.setFrame(Integer.parseInt(string));
             animation.setTriggerBuilderData(triggerBuilder.createBuilderData());
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
         }
     }
 
@@ -64,5 +66,4 @@ public class SelectFrameConversationPrompt extends BaseEditorValidatingPrompt {
     public String getPromptText(ConversationContext cc) {
         return MessageUtil.formatPromptMessage(Messages.MSG_SELECT_FRAME);
     }
-
 }

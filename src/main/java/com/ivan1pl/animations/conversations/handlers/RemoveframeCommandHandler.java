@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +33,11 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class RemoveframeCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     private final Prompt failPrompt;
-    
+
     public RemoveframeCommandHandler(Prompt successPrompt, Prompt failPrompt) {
         super("removeframe", 1, "frame_index");
         this.successPrompt = successPrompt;
@@ -45,19 +45,22 @@ public class RemoveframeCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation instanceof MovingAnimation) {
             throw new AnimationTypeException();
         }
         StationaryAnimation sAnimation = (StationaryAnimation) animation;
-        
+
         int index = Integer.parseUnsignedInt(params[1]);
         sAnimation.stop();
         if (sAnimation.removeFrame(index)) {
-            return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_FRAME_REMOVED));
+            return new ConversationResponsePrompt(
+                    successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_FRAME_REMOVED));
         } else {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_WRONG_FRAME_INDEX, new Long(0), new Long(sAnimation.getFrameCount()-1)));
+            return new ConversationResponsePrompt(
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_WRONG_FRAME_INDEX, 0L, (long)
+                            (sAnimation.getFrameCount() - 1)));
         }
     }
-    
 }

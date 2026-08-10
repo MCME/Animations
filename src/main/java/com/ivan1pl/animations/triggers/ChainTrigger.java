@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -28,11 +28,11 @@ import org.bukkit.event.EventHandler;
  * @author Ivan1pl
  */
 public class ChainTrigger extends BaseRangeTrigger {
-    
+
     private final String animationName;
-    
+
     private final int frame;
-    
+
     public ChainTrigger(Animation animation, String animationName, int frame) {
         super(animation);
         this.animationName = animationName;
@@ -55,7 +55,7 @@ public class ChainTrigger extends BaseRangeTrigger {
             setFinished(false);
         }
     }
-    
+
     @EventHandler
     public void onFrameDisplayed(AnimationFrameDisplayedEvent event) {
         Animation triggeringAnimation = Animations.getAnimation(animationName);
@@ -63,5 +63,4 @@ public class ChainTrigger extends BaseRangeTrigger {
             execute();
         }
     }
-    
 }

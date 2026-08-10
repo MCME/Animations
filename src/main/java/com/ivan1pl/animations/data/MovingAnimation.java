@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -21,37 +21,29 @@ package com.ivan1pl.animations.data;
 import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.exceptions.InvalidSelectionException;
 import com.ivan1pl.animations.utils.SerializationUtils;
+import java.io.File;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.List;
-
-//import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
  * @author Ivan1pl, Eriol_Eandur
  */
-public class MovingAnimation extends Animation implements Serializable {
-    
-    private static final long serialVersionUID = -3124628769457473325L;
-    
+public class MovingAnimation extends Animation {
+
     private IFrame frame;
-    
+
     private IFrame background;
-    
+
     private final Selection selection;
-    
+
     private int stepX;
     private int stepY;
     private int stepZ;
     private int maxDistance;
-    
+
     public MovingAnimation(Selection selection) throws InvalidSelectionException {
         if (!Selection.isValid(selection)) {
             throw new InvalidSelectionException();
@@ -60,10 +52,10 @@ public class MovingAnimation extends Animation implements Serializable {
         frame = MCMEStoragePlotFrame.fromSelection(selection);
         background = MCMEStoragePlotFrame.fromSelection(selection);
     }
-    
+
     public void updateBackground() {
         Selection s = SerializationUtils.clone(selection);
-        s.expand(stepX*getFrameCount(), stepY*getFrameCount(), stepZ*getFrameCount());
+        s.expand(stepX * getFrameCount(), stepY * getFrameCount(), stepZ * getFrameCount());
         background = MCMEStoragePlotFrame.fromSelection(s);
     }
 
@@ -81,14 +73,18 @@ public class MovingAnimation extends Animation implements Serializable {
     public int getFrameCount() {
         return maxDistance;
     }
-    
+
     public void movePlayers(int index, boolean reverse) {
         List<Player> allPlayers = selection.getPoint1().getWorld().getPlayers();
         for (Player player : allPlayers) {
-            Animations.debug(Messages.DEBUG_MOVING_ANIMATION_CHECKING_PLAYER, this.getClass().getName(), player.getName());
-            if (frame.isInside(player.getLocation(), stepX * index, stepY * index, stepZ * index) && player.isOnGround()) {
+            Animations.debug(
+                    Messages.DEBUG_MOVING_ANIMATION_CHECKING_PLAYER,
+                    this.getClass().getName(),
+                    player.getName());
+            if (frame.isInside(player.getLocation(), stepX * index, stepY * index, stepZ * index)
+                    && player.isOnGround()) {
                 Animations.debug(Messages.DEBUG_MOVING_PLAYER, this.getClass().getName(), player.getName());
-                if(reverse) { 
+                if (reverse) {
                     player.teleport(player.getLocation().add(-stepX, -stepY, -stepZ));
                 } else {
                     player.teleport(player.getLocation().add(stepX, stepY, stepZ));
@@ -100,64 +96,32 @@ public class MovingAnimation extends Animation implements Serializable {
     @Override
     public boolean isPlayerInRange(Player player, int range) {
         Selection s = background.toSelection();
-        return player.getWorld().equals(s.getPoint1().getWorld()) ?
-                s.getDistance(player.getLocation()) <= range : false;
+        return player.getWorld().equals(s.getPoint1().getWorld())
+                ? s.getDistance(player.getLocation()) <= range
+                : false;
     }
 
     @Override
     public int getSizeInBlocks() {
-        return frame.getSizeX() * frame.getSizeY() * frame.getSizeZ() +
-                background.getSizeX() * background.getSizeY() * background.getSizeZ();
+        return frame.getSizeX() * frame.getSizeY() * frame.getSizeZ()
+                + background.getSizeX() * background.getSizeY() * background.getSizeZ();
     }
 
     @Override
     protected Location getCenter() {
         return background.getCenter();
     }
-    
-    @Override
-    public void saveTo(File folder, ObjectOutputStream out) throws IOException {
-        super.saveTo(folder, out);
-        if(background instanceof MCMEStoragePlotFrame) {
-            if(!folder.exists()) {
-                folder.mkdir();
-            }
-            ((MCMEStoragePlotFrame)background).save(new File(folder,"background.mcme"));
-        }
-        if(frame instanceof MCMEStoragePlotFrame) {
-            if(!folder.exists()) {
-                folder.mkdir();
-            }
-            ((MCMEStoragePlotFrame)frame).save(new File(folder,"frame.mcme"));
-        }
-    }
-    
+
     @Override
     public boolean prepare(File folder) {
-        if(!folder.exists()) {
+        if (!folder.exists()) {
             folder.mkdir();
         }
-        if(background instanceof MCMEStoragePlotFrame) {
-            ((MCMEStoragePlotFrame)background).load(new File(folder,"background.mcme"));
+        if (background instanceof MCMEStoragePlotFrame) {
+            ((MCMEStoragePlotFrame) background).load(new File(folder, "background.mcme"));
         }
-        if(frame instanceof MCMEStoragePlotFrame) {
-            ((MCMEStoragePlotFrame)frame).load(new File(folder,"frame.mcme"));
-        }
-        if(background instanceof BlockIdFrame) {
-            ((BlockIdFrame)background).init();
-        }
-        if(frame instanceof BlockIdFrame) {
-            ((BlockIdFrame)frame).init();
-        }
-        if(background instanceof BlockIdFrame) {
-            MCMEStoragePlotFrame update = MCMEStoragePlotFrame.fromSelection(background.toSelection());
-            update.setBlocks(((BlockIdFrame)background).getBlockMaterials());
-            background = update;
-        }
-        if(frame instanceof BlockIdFrame) {
-            MCMEStoragePlotFrame update = MCMEStoragePlotFrame.fromSelection(frame.toSelection());
-            update.setBlocks(((BlockIdFrame)frame).getBlockMaterials());
-            frame = update;
+        if (frame instanceof MCMEStoragePlotFrame) {
+            ((MCMEStoragePlotFrame) frame).load(new File(folder, "frame.mcme"));
         }
         return true;
     }
@@ -201,40 +165,49 @@ public class MovingAnimation extends Animation implements Serializable {
     @Override
     public void save(File folder, ConfigurationSection config) {
         super.save(folder, config);
-        config.set("AnimationType",AnimationType.MOVING.name());
+        config.set("AnimationType", AnimationType.MOVING.name());
         selection.save(config);
-        config.set("StepX",stepX);
-        config.set("StepY",stepY);
-        config.set("StepZ",stepZ);
-        config.set("MaxDistance",maxDistance);
-        if(background instanceof MCMEStoragePlotFrame) {
-            if(!folder.exists()) {
+        config.set("StepX", stepX);
+        config.set("StepY", stepY);
+        config.set("StepZ", stepZ);
+        config.set("MaxDistance", maxDistance);
+        if (background instanceof MCMEStoragePlotFrame) {
+            if (!folder.exists()) {
                 folder.mkdir();
             }
-            ((MCMEStoragePlotFrame)background).save(new File(folder,"background.mcme"));
+            ((MCMEStoragePlotFrame) background).save(new File(folder, "background.mcme"));
         }
-        if(frame instanceof MCMEStoragePlotFrame) {
-            if(!folder.exists()) {
+        if (frame instanceof MCMEStoragePlotFrame) {
+            if (!folder.exists()) {
                 folder.mkdir();
             }
-            ((MCMEStoragePlotFrame)frame).save(new File(folder,"frame.mcme"));
+            ((MCMEStoragePlotFrame) frame).save(new File(folder, "frame.mcme"));
         }
     }
 
     public static MovingAnimation load(ConfigurationSection config) throws InvalidSelectionException {
         MovingAnimation animation = new MovingAnimation(Selection.load(config));
-        Animation.load(animation,config);
-        animation.setStepX(config.getInt("StepX",0));
-        animation.setStepY(config.getInt("StepY",0));
-        animation.setStepZ(config.getInt("StepZ",0));
-        animation.setMaxDistance(config.getInt("MaxDistance",0));
-        animation.frame = MCMEStoragePlotFrame.fromSelection(animation.getSelection(),true);
-        Selection backgroundSelection = animation.selection;
-        backgroundSelection.expand(animation.stepX*animation.getFrameCount(),
-                                   animation.stepY*animation.getFrameCount(),
-                                   animation.stepZ*animation.getFrameCount());
-        animation.background = MCMEStoragePlotFrame.fromSelection(backgroundSelection,true);
+        Animation.load(animation, config);
+        animation.setStepX(config.getInt("StepX", 0));
+        animation.setStepY(config.getInt("StepY", 0));
+        animation.setStepZ(config.getInt("StepZ", 0));
+        animation.setMaxDistance(config.getInt("MaxDistance", 0));
+        animation.frame = MCMEStoragePlotFrame.fromSelection(animation.getSelection(), true);
+        Selection backgroundSelection = expandedBackgroundSelection(
+                animation.selection, animation.stepX, animation.stepY, animation.stepZ, animation.getFrameCount());
+        animation.background = MCMEStoragePlotFrame.fromSelection(backgroundSelection, true);
         return animation;
     }
 
+    /**
+     * Builds the (larger) background selection from the frame selection. The frame selection
+     * must be left untouched: {@link Selection#expand} mutates in place, so this clones first.
+     * Aliasing the stored selection here used to grow it by {@code step * frameCount} on every
+     * load/save cycle (audit finding H5).
+     */
+    static Selection expandedBackgroundSelection(Selection selection, int stepX, int stepY, int stepZ, int frameCount) {
+        Selection expanded = SerializationUtils.clone(selection);
+        expanded.expand(stepX * frameCount, stepY * frameCount, stepZ * frameCount);
+        return expanded;
+    }
 }

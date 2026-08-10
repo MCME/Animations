@@ -45,7 +45,8 @@ public class UpdateframeCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation instanceof MovingAnimation) {
             throw new AnimationTypeException();
         }
@@ -54,10 +55,12 @@ public class UpdateframeCommandHandler extends ConversationCommandHandler {
         int index = Integer.parseUnsignedInt(params[1]);
         sAnimation.stop();
         if (sAnimation.updateFrame(index)) {
-            return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_FRAME_UPDATED));
+            return new ConversationResponsePrompt(
+                    successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_FRAME_UPDATED));
         } else {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_WRONG_FRAME_INDEX, 0, sAnimation.getFrameCount()-1));
+            return new ConversationResponsePrompt(
+                    failPrompt,
+                    MessageUtil.formatErrorMessage(Messages.MSG_WRONG_FRAME_INDEX, 0, sAnimation.getFrameCount() - 1));
         }
     }
-
 }

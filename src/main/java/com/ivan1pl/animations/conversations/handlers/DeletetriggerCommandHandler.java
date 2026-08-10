@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -31,18 +31,19 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class DeletetriggerCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     public DeletetriggerCommandHandler(Prompt successPrompt) {
         super("deletetrigger", 0);
         this.successPrompt = successPrompt;
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         animation.setTriggerBuilderData(null);
-        return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_DELETED));
+        return new ConversationResponsePrompt(
+                successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_DELETED));
     }
-    
 }

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -28,17 +28,18 @@ import org.bukkit.entity.Player;
  * @author Ivan1pl
  */
 public class MessageUtil {
-    
+
     private static final String NAME = "Animations";
-    
+
     private static final String PREFIX_ERR = ChatColor.RED + "[" + ChatColor.DARK_RED + NAME + ChatColor.RED + "] ";
-    
+
     private static final String PREFIX_INFO = ChatColor.AQUA + "[" + ChatColor.BLUE + NAME + ChatColor.AQUA + "] ";
-    
-    private static final String PREFIX_PROMPT = ChatColor.GREEN + "[" + ChatColor.DARK_GREEN + NAME + ChatColor.GREEN + "] ";
-    
+
+    private static final String PREFIX_PROMPT =
+            ChatColor.GREEN + "[" + ChatColor.DARK_GREEN + NAME + ChatColor.GREEN + "] ";
+
     private static final String PREFIX_NOFORMAT = "[" + NAME + "] ";
-    
+
     public static void sendErrorMessage(CommandSender sender, String message, Object... messageParams) {
         if (sender instanceof Player) {
             sender.sendMessage(PREFIX_ERR + MessageFormat.format(message, messageParams));
@@ -46,7 +47,7 @@ public class MessageUtil {
             sender.sendMessage(PREFIX_NOFORMAT + MessageFormat.format(message, messageParams));
         }
     }
-    
+
     public static void sendInfoMessage(CommandSender sender, String message, Object... messageParams) {
         if (sender instanceof Player) {
             sender.sendMessage(PREFIX_INFO + MessageFormat.format(message, messageParams));
@@ -54,25 +55,24 @@ public class MessageUtil {
             sender.sendMessage(PREFIX_NOFORMAT + MessageFormat.format(message, messageParams));
         }
     }
-    
+
     public static String formatMessage(String message, Object... messageParams) {
         return MessageFormat.format(message, messageParams);
     }
-    
+
     public static String formatMessageWithPrefix(String message, Object... messageParams) {
         return PREFIX_NOFORMAT + formatMessage(message, messageParams);
     }
-    
+
     public static String formatInfoMessage(String message, Object... messageParams) {
         return PREFIX_INFO + MessageFormat.format(message, messageParams);
     }
-    
+
     public static String formatErrorMessage(String message, Object... messageParams) {
         return PREFIX_ERR + MessageFormat.format(message, messageParams);
     }
-    
+
     public static String formatPromptMessage(String message, Object... messageParams) {
         return PREFIX_PROMPT + MessageFormat.format(message, messageParams);
     }
-    
 }

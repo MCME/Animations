@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -20,22 +20,17 @@ package com.ivan1pl.animations.triggers;
 
 import com.ivan1pl.animations.constants.MouseButton;
 import com.ivan1pl.animations.data.AnimationsLocation;
-import org.bukkit.configuration.ConfigurationSection;
-
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Don't store whole trigger in animation, just object of this class.
- * 
+ *
  * When animation is loaded it will use it to create a trigger.
  * @author Ivan1pl
  */
-public class TriggerBuilderData implements Serializable {
-
-    private static final long serialVersionUID = -955742584558670327L;
+public class TriggerBuilderData {
 
     private final TriggerType type;
     private final int range;
@@ -44,8 +39,15 @@ public class TriggerBuilderData implements Serializable {
     private final List<MouseButton> triggerButtons;
     private final String animationName;
     private final int frame;
-    
-    public TriggerBuilderData(TriggerType type, int range, String password, List<AnimationsLocation> triggerBlocks, List<MouseButton> triggerButtons, String animationName, int frame) {
+
+    public TriggerBuilderData(
+            TriggerType type,
+            int range,
+            String password,
+            List<AnimationsLocation> triggerBlocks,
+            List<MouseButton> triggerButtons,
+            String animationName,
+            int frame) {
         this.type = type;
         this.range = range;
         this.password = password;
@@ -54,21 +56,22 @@ public class TriggerBuilderData implements Serializable {
         this.animationName = animationName;
         this.frame = frame;
     }
-    
+
     public TriggerBuilderData(TriggerType type, int range, String password) {
-        this (type, range, password, null, null, null, -1);
+        this(type, range, password, null, null, null, -1);
     }
-    
-    public TriggerBuilderData(TriggerType type, int range, AnimationsLocation triggerBlock1, MouseButton triggerButton1) {
-        this (type, range, null, List.of(triggerBlock1), List.of(triggerButton1), null, -1);
+
+    public TriggerBuilderData(
+            TriggerType type, int range, AnimationsLocation triggerBlock1, MouseButton triggerButton1) {
+        this(type, range, null, List.of(triggerBlock1), List.of(triggerButton1), null, -1);
     }
-    
+
     public TriggerBuilderData(TriggerType type, int range) {
-        this (type, range, null, null, null, null, -1);
+        this(type, range, null, null, null, null, -1);
     }
 
     public TriggerBuilderData(TriggerType type, int range, String animationName, int frame) {
-        this (type, range, null, null, null, animationName, frame);
+        this(type, range, null, null, null, animationName, frame);
     }
 
     public TriggerType getType() {
@@ -101,18 +104,18 @@ public class TriggerBuilderData implements Serializable {
 
     public void save(ConfigurationSection config) {
         ConfigurationSection section = config.createSection("TriggerBuilderData");
-        section.set("TriggerType",type.name());
-        section.set("Range",range);
-        if(password!=null) section.set("Password",password);
-        section.set("Frame",frame);
-        section.set("AnimationName",animationName);
-        if(triggerBlocks!=null) {
+        section.set("TriggerType", type.name());
+        section.set("Range", range);
+        if (password != null) section.set("Password", password);
+        section.set("Frame", frame);
+        section.set("AnimationName", animationName);
+        if (triggerBlocks != null) {
             ConfigurationSection blockSection = section.createSection("TriggerBlocks");
             for (int i = 0; i < triggerBlocks.size(); i++) {
-                triggerBlocks.get(i).save(""+i,blockSection);
+                triggerBlocks.get(i).save("" + i, blockSection);
             }
         }
-        if(triggerButtons!=null) {
+        if (triggerButtons != null) {
             ConfigurationSection buttonSection = section.createSection("TriggerButtons");
             for (int i = 0; i < triggerButtons.size(); i++) {
                 buttonSection.set("" + i, triggerButtons.get(i).name());
@@ -122,13 +125,13 @@ public class TriggerBuilderData implements Serializable {
 
     public static TriggerBuilderData load(ConfigurationSection config) {
         ConfigurationSection section = config.getConfigurationSection("TriggerBuilderData");
-        if(section==null) {
+        if (section == null) {
             return null;
         } else {
 
             List<AnimationsLocation> triggerBlocks = null;
             ConfigurationSection blockSection = section.getConfigurationSection("TriggerBlocks");
-            if(blockSection!=null) {
+            if (blockSection != null) {
                 triggerBlocks = new ArrayList<>();
                 int i = 0;
                 while (blockSection.isSet("" + i)) {
@@ -138,22 +141,22 @@ public class TriggerBuilderData implements Serializable {
             }
             List<MouseButton> triggerButtons = null;
             ConfigurationSection buttonSection = section.getConfigurationSection("TriggerButtons");
-            if(buttonSection!=null) {
+            if (buttonSection != null) {
                 triggerButtons = new ArrayList<>();
                 int i = 0;
                 while (buttonSection.isSet("" + i)) {
-                    triggerButtons.add(MouseButton.valueOf(buttonSection.getString(""+i)));
+                    triggerButtons.add(MouseButton.valueOf(buttonSection.getString("" + i)));
                     i++;
                 }
             }
-            return new TriggerBuilderData(TriggerType.valueOf(section.getString("TriggerType")),
+            return new TriggerBuilderData(
+                    TriggerType.valueOf(section.getString("TriggerType")),
                     section.getInt("Range"),
-                    section.getString("Password",null),
+                    section.getString("Password", null),
                     triggerBlocks,
                     triggerButtons,
-                    section.getString("AnimationName",null),
-                    section.getInt("Frame",-1));
-
+                    section.getString("AnimationName", null),
+                    section.getInt("Frame", -1));
         }
     }
 }

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -18,11 +18,9 @@
  */
 package com.ivan1pl.animations.data;
 
-import org.bukkit.Location;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
-
 import java.io.Serializable;
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  *
@@ -31,37 +29,39 @@ import java.io.Serializable;
 public class Selection implements Serializable {
 
     private static final long serialVersionUID = 3063220770448203490L;
-    
+
     private AnimationsLocation point1;
     private AnimationsLocation point2;
-    
+
     private boolean validate() {
-        return (point1 != null && point2 != null && point1.getWorld().getUID().equals(point2.getWorld().getUID()));
+        return (point1 != null
+                && point2 != null
+                && point1.getWorld().getUID().equals(point2.getWorld().getUID()));
     }
-    
+
     public static boolean isValid(Selection sel) {
         return sel != null && sel.validate();
     }
-    
+
     public void setPoint1(Location loc) {
         point1 = AnimationsLocation.fromLocation(loc);
     }
-    
+
     public void setPoint2(Location loc) {
         point2 = AnimationsLocation.fromLocation(loc);
     }
-    
+
     public int getVolume() {
         if (!validate()) {
             return 0;
         }
-        
+
         int dx = Math.abs(point1.getBlockX() - point2.getBlockX()) + 1;
         int dy = Math.abs(point1.getBlockY() - point2.getBlockY()) + 1;
         int dz = Math.abs(point1.getBlockZ() - point2.getBlockZ()) + 1;
-        return dx*dy*dz;
+        return dx * dy * dz;
     }
-    
+
     public void expand(int dx, int dy, int dz) {
         if (dx < 0) {
             if (point1.getBlockX() < point2.getBlockX()) {
@@ -76,7 +76,7 @@ public class Selection implements Serializable {
                 point1.add(dx, 0, 0);
             }
         }
-        
+
         if (dy < 0) {
             if (point1.getBlockY() < point2.getBlockY()) {
                 point1.add(0, dy, 0);
@@ -90,7 +90,7 @@ public class Selection implements Serializable {
                 point1.add(0, dy, 0);
             }
         }
-        
+
         if (dz < 0) {
             if (point1.getBlockZ() < point2.getBlockZ()) {
                 point1.add(0, 0, dz);
@@ -105,7 +105,7 @@ public class Selection implements Serializable {
             }
         }
     }
-    
+
     public double getDistance(Location l) {
         double maxX = Math.max(point1.getX(), point2.getX());
         double minX = Math.min(point1.getX(), point2.getX());
@@ -120,14 +120,16 @@ public class Selection implements Serializable {
     }
 
     public Location getCenter() {
-        double cX = (point1.getX() + point2.getX())/2.;
-        double cY = (point1.getY() + point2.getY())/2.;
-        double cZ = (point1.getZ() + point2.getZ())/2.;
+        double cX = (point1.getX() + point2.getX()) / 2.;
+        double cY = (point1.getY() + point2.getY()) / 2.;
+        double cZ = (point1.getZ() + point2.getZ()) / 2.;
         return new Location(point1.getWorld(), cX, cY, cZ);
     }
 
     public Location getLowerCorner() {
-        return new Location(point1.getWorld(), Math.min(point1.getBlockX(), point2.getBlockX()),
+        return new Location(
+                point1.getWorld(),
+                Math.min(point1.getBlockX(), point2.getBlockX()),
                 Math.min(point1.getBlockY(), point2.getBlockY()),
                 Math.min(point1.getBlockZ(), point2.getBlockZ()));
     }
@@ -142,15 +144,15 @@ public class Selection implements Serializable {
 
     public void save(ConfigurationSection config) {
         ConfigurationSection section = config.createSection("Selection");
-        point1.save("Point1",section);
-        point2.save("Point2",section);
+        point1.save("Point1", section);
+        point2.save("Point2", section);
     }
 
     public static Selection load(ConfigurationSection config) {
         ConfigurationSection section = config.getConfigurationSection("Selection");
         Selection selection = new Selection();
-        selection.point1 = (AnimationsLocation.load("Point1",section));
-        selection.point2 = (AnimationsLocation.load("Point2",section));
+        selection.point1 = (AnimationsLocation.load("Point1", section));
+        selection.point2 = (AnimationsLocation.load("Point2", section));
         return selection;
     }
 }

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -28,9 +28,9 @@ import java.util.Map;
  * @author Ivan1pl
  */
 public class EventDispatcher {
-    
+
     private final Map<String, List<EventListener>> listeners = new HashMap<>();
-    
+
     public void addEventListener(String type, EventListener listener) {
         List<EventListener> l = listeners.get(type);
         if (l == null) {
@@ -43,14 +43,14 @@ public class EventDispatcher {
             }
         }
     }
-    
+
     public void removeEventListener(String type, EventListener listener) {
         List<EventListener> l = listeners.get(type);
         if (l != null) {
             l.remove(listener);
         }
     }
-    
+
     public void dispatchEvent(Event event) {
         if (event == null) {
             return;
@@ -62,5 +62,4 @@ public class EventDispatcher {
             }
         }
     }
-    
 }

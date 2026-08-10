@@ -28,11 +28,11 @@ public enum SoundPlayMode {
     ALL_FRAMES;
 
     public static SoundPlayMode fromString(String value) {
-        if (value.equalsIgnoreCase("b")) {
+        if (value.equalsIgnoreCase("b") || value.equalsIgnoreCase("begin")) {
             return BEGIN;
-        } else if (value.equalsIgnoreCase("e")) {
+        } else if (value.equalsIgnoreCase("e") || value.equalsIgnoreCase("end")) {
             return END;
-        } else if (value.equalsIgnoreCase("a")) {
+        } else if (value.equalsIgnoreCase("a") || value.equalsIgnoreCase("all")) {
             return ALL_FRAMES;
         } else {
             return null;

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -27,9 +27,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
  * @author Ivan1pl
  */
 public class PasswordTrigger extends BaseRangeTrigger {
-    
+
     private final String password;
-    
+
     public PasswordTrigger(Animation animation, String password) {
         super(animation);
         this.password = password;
@@ -48,12 +48,11 @@ public class PasswordTrigger extends BaseRangeTrigger {
             startAnimation();
         }
     }
-    
+
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if (event.getMessage().equalsIgnoreCase(password) && isPlayerInRange(event.getPlayer())) {
             execute();
         }
     }
-    
 }

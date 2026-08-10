@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -31,19 +31,20 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class PreviewCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     public PreviewCommandHandler(Prompt successPrompt) {
         super("preview", 0);
         this.successPrompt = successPrompt;
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         animation.stop();
         animation.play();
-        return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_PLAYING_PREVIEW));
+        return new ConversationResponsePrompt(
+                successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_PLAYING_PREVIEW));
     }
-    
 }

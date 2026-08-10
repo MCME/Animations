@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,29 +33,25 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class SaveCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     public SaveCommandHandler(Prompt successPrompt) {
         super("save", 0);
         this.successPrompt = successPrompt;
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         animation.stop();
         OperationResult result = Animations.saveAnimation(animationName);
-        String message = "";
-        switch (result) {
-            case SUCCESS:
-                message = MessageUtil.formatInfoMessage(Messages.MSG_ANIMATION_SAVED);
-                break;
-            case INTERNAL_ERROR:
-            case NOT_FOUND:
-                message = MessageUtil.formatErrorMessage(Messages.MSG_SAVE_FAILED, animationName);
-                break;
-        }
+        String message =
+                switch (result) {
+                    case SUCCESS -> MessageUtil.formatInfoMessage(Messages.MSG_ANIMATION_SAVED);
+                    case INTERNAL_ERROR, NOT_FOUND ->
+                        MessageUtil.formatErrorMessage(Messages.MSG_SAVE_FAILED, animationName);
+                };
         return new ConversationResponsePrompt(successPrompt, message);
     }
-    
 }

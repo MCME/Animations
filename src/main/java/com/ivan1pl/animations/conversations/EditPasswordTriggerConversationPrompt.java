@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -32,17 +32,17 @@ import org.bukkit.conversations.Prompt;
 public class EditPasswordTriggerConversationPrompt extends BaseEditorStringPrompt {
 
     private final Prompt retPrompt;
-    
+
     private final Animation animation;
-    
+
     private final TriggerBuilder triggerBuilder;
-    
+
     public EditPasswordTriggerConversationPrompt(Prompt retPrompt, Animation animation, TriggerBuilder triggerBuilder) {
         this.retPrompt = retPrompt;
         this.animation = animation;
         this.triggerBuilder = triggerBuilder;
     }
-    
+
     @Override
     public String getPromptText(ConversationContext cc) {
         return MessageUtil.formatPromptMessage(Messages.MSG_ENTER_PASSWORD_FOR_TRIGGER);
@@ -53,5 +53,4 @@ public class EditPasswordTriggerConversationPrompt extends BaseEditorStringPromp
         animation.setTriggerBuilderData(triggerBuilder.setPassword(string).createBuilderData());
         return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
     }
-    
 }

@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -18,11 +18,13 @@
  */
 package com.ivan1pl.animations;
 
-import com.ivan1pl.animations.commands.AnimationsCommandExecutor;
+import com.ivan1pl.animations.commands.AnimCommand;
 import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.conversations.EditAnimationConversationFactory;
 import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.listeners.PlayerListener;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -30,26 +32,25 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Ivan1pl
  */
 public class AnimationsPlugin extends JavaPlugin {
-    
+
     private static AnimationsPlugin pluginInstance;
-    private final AnimationsCommandExecutor executor = new AnimationsCommandExecutor();
     private EditAnimationConversationFactory conversationFactory;
-    
+
     @Override
     public void onEnable() {
         pluginInstance = this;
         this.saveDefaultConfig();
-        
-        getCommand("anim").setExecutor(executor);
-        getCommand("aplay").setExecutor(executor);
-        getCommand("alist").setExecutor(executor);
-        getCommand("adelete").setExecutor(executor);
-        
+
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            final Commands registrar = commands.registrar();
+            registrar.register(AnimCommand.command().build());
+        });
+
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        
+
         Animations.reload();
         conversationFactory = new EditAnimationConversationFactory(this);
-        
+
         getLogger().info(Messages.INFO_ENABLED);
     }
 

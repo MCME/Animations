@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +33,11 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class StepCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     private final Prompt failPrompt;
-    
+
     public StepCommandHandler(Prompt successPrompt, Prompt failPrompt) {
         super("step", 3, "x", "y", "z");
         this.successPrompt = successPrompt;
@@ -45,25 +45,27 @@ public class StepCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation instanceof StationaryAnimation) {
             throw new AnimationTypeException();
         }
-        
+
         MovingAnimation mAnimation = (MovingAnimation) animation;
-        
+
         int x = Integer.parseInt(params[1]);
         int y = Integer.parseInt(params[2]);
         int z = Integer.parseInt(params[3]);
         mAnimation.stop();
         if (x == 0 && y == 0 && z == 0) {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_STEP, x, y, z));
+            return new ConversationResponsePrompt(
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_STEP, x, y, z));
         } else {
             mAnimation.setStepX(x);
             mAnimation.setStepY(y);
             mAnimation.setStepZ(z);
-            return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_STEP_SET, x, y, z));
+            return new ConversationResponsePrompt(
+                    successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_STEP_SET, x, y, z));
         }
     }
-    
 }

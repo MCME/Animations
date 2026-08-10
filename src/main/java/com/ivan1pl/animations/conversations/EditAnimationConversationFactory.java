@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,9 +33,9 @@ import org.bukkit.plugin.Plugin;
  * @author Ivan1pl
  */
 public class EditAnimationConversationFactory implements ConversationAbandonedListener {
-    
+
     private final ConversationFactory factory;
-    
+
     public EditAnimationConversationFactory(Plugin plugin) {
         factory = new ConversationFactory(plugin)
                 .withModality(false)
@@ -43,10 +43,11 @@ public class EditAnimationConversationFactory implements ConversationAbandonedLi
                 .withLocalEcho(true)
                 .addConversationAbandonedListener(this);
     }
-    
+
     public void startConversation(Player player, String animationName) {
         Animation animation = Animations.getAnimation(animationName);
-        Conversation c = factory.withFirstPrompt(new EditAnimationConversationPrompt(animation != null)).buildConversation(player);
+        Conversation c = factory.withFirstPrompt(new EditAnimationConversationPrompt(animation != null))
+                .buildConversation(player);
         ConversationContext cc = c.getContext();
         cc.setSessionData("name", animationName);
         cc.setSessionData("animation", animation);
@@ -61,9 +62,8 @@ public class EditAnimationConversationFactory implements ConversationAbandonedLi
             if (animation != null) {
                 animation.stop();
             }
-            
+
             Animations.reloadAnimation(name);
         }
     }
-    
 }

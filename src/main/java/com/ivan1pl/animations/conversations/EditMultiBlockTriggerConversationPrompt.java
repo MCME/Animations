@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,18 +35,19 @@ import org.bukkit.entity.Player;
  * @author Ivan1pl
  */
 public class EditMultiBlockTriggerConversationPrompt extends BaseEditorFixedSetPrompt {
-    
+
     private final Prompt retPrompt;
-    
+
     private final Animation animation;
-    
+
     private final TriggerBuilder triggerBuilder;
-    
+
     private int currentBlock;
-    
+
     private final int blocks;
-    
-    public EditMultiBlockTriggerConversationPrompt(Prompt retPrompt, Animation animation, TriggerBuilder triggerBuilder, int currentBlock, int blocks) {
+
+    public EditMultiBlockTriggerConversationPrompt(
+            Prompt retPrompt, Animation animation, TriggerBuilder triggerBuilder, int currentBlock, int blocks) {
         super("l", "r", "b", "c");
         this.retPrompt = retPrompt;
         this.animation = animation;
@@ -58,20 +59,24 @@ public class EditMultiBlockTriggerConversationPrompt extends BaseEditorFixedSetP
     @Override
     protected Prompt acceptValidatedInput(ConversationContext cc, String string) {
         if ("c".equalsIgnoreCase(string)) {
-            return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
+            return new ConversationResponsePrompt(
+                    retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_EDIT_TRIGGER_CANCELLED));
         } else if ("l".equalsIgnoreCase(string) || "r".equalsIgnoreCase(string) || "b".equalsIgnoreCase(string)) {
             MouseButton button = MouseButton.fromString(string);
             Location l = Animations.getBlockSelection((Player) cc.getForWhom());
             if (l == null) {
-                return new ConversationResponsePrompt(this, MessageUtil.formatErrorMessage(Messages.MSG_EDIT_BLOCK_TRIGGER_NOBLOCK));
+                return new ConversationResponsePrompt(
+                        this, MessageUtil.formatErrorMessage(Messages.MSG_EDIT_BLOCK_TRIGGER_NOBLOCK));
             } else {
                 triggerBuilder.addTriggerBlock(AnimationsLocation.fromLocation(l), button);
                 if (currentBlock == blocks) {
                     animation.setTriggerBuilderData(triggerBuilder.createBuilderData());
-                    return new ConversationResponsePrompt(retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
+                    return new ConversationResponsePrompt(
+                            retPrompt, MessageUtil.formatInfoMessage(Messages.MSG_TRIGGER_CHANGED));
                 } else {
                     currentBlock++;
-                    return new ConversationResponsePrompt(this, MessageUtil.formatInfoMessage(Messages.MSG_BLOCK_ADDED));
+                    return new ConversationResponsePrompt(
+                            this, MessageUtil.formatInfoMessage(Messages.MSG_BLOCK_ADDED));
                 }
             }
         } else {
@@ -81,7 +86,9 @@ public class EditMultiBlockTriggerConversationPrompt extends BaseEditorFixedSetP
 
     @Override
     public String getPromptText(ConversationContext cc) {
-        return MessageUtil.formatPromptMessage(Messages.MSG_EDIT_MULTI_BLOCK_TRIGGER, Animations.getBlockSelectorMaterial().toString(), currentBlock);
+        return MessageUtil.formatPromptMessage(
+                Messages.MSG_EDIT_MULTI_BLOCK_TRIGGER,
+                Animations.getBlockSelectorMaterial().toString(),
+                currentBlock);
     }
-    
 }

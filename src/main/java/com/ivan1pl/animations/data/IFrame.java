@@ -12,16 +12,20 @@ import org.bukkit.Location;
  * @author Eriol_Eandur
  */
 public interface IFrame {
-  
+
     int getSizeX();
+
     int getSizeY();
+
     int getSizeZ();
 
     void show();
-    void show(int offsetX, int offsetY, int offsetZ);
-    boolean isInside(Location location, int offsetX, int offsetY, int offsetZ);
-    Selection toSelection();
-    Location getCenter();
-    boolean isOutdated();
 
+    void show(int offsetX, int offsetY, int offsetZ);
+
+    boolean isInside(Location location, int offsetX, int offsetY, int offsetZ);
+
+    Selection toSelection();
+
+    Location getCenter();
 }

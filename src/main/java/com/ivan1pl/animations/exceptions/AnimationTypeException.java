@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -23,21 +23,20 @@ package com.ivan1pl.animations.exceptions;
  * @author Ivan1pl
  */
 public class AnimationTypeException extends Exception {
-    
+
     public AnimationTypeException() {
         super();
     }
-    
+
     public AnimationTypeException(String message) {
         super(message);
     }
-    
+
     public AnimationTypeException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
     public AnimationTypeException(Throwable cause) {
         super(cause);
     }
-    
 }

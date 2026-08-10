@@ -1,8 +1,8 @@
-/* 
+/*
  *  Copyright (C) 2016 Ivan1pl
- * 
+ *
  *  This file is part of Animations.
- * 
+ *
  *  Animations is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +33,11 @@ import org.bukkit.conversations.Prompt;
  * @author Ivan1pl
  */
 public class UpdateBackgroundCommandHandler extends ConversationCommandHandler {
-    
+
     private final Prompt successPrompt;
-    
+
     private final Prompt failPrompt;
-    
+
     public UpdateBackgroundCommandHandler(Prompt successPrompt, Prompt failPrompt) {
         super("updatebackground", 0);
         this.successPrompt = successPrompt;
@@ -45,20 +45,23 @@ public class UpdateBackgroundCommandHandler extends ConversationCommandHandler {
     }
 
     @Override
-    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params) throws AnimationTypeException {
+    public Prompt handle(ConversationContext cc, Animation animation, String animationName, String[] params)
+            throws AnimationTypeException {
         if (animation instanceof StationaryAnimation) {
             throw new AnimationTypeException();
         }
-        
+
         MovingAnimation mAnimation = (MovingAnimation) animation;
         if (mAnimation.getMaxDistance() == 0) {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_BACKGROUND_NEEDS_MAX_DISTANCE));
+            return new ConversationResponsePrompt(
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_BACKGROUND_NEEDS_MAX_DISTANCE));
         } else if (mAnimation.getStepX() == 0 && mAnimation.getStepY() == 0 && mAnimation.getStepZ() == 0) {
-            return new ConversationResponsePrompt(failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_BACKGROUND_NEEDS_STEP));
+            return new ConversationResponsePrompt(
+                    failPrompt, MessageUtil.formatErrorMessage(Messages.MSG_INVALID_BACKGROUND_NEEDS_STEP));
         } else {
             mAnimation.updateBackground();
-            return new ConversationResponsePrompt(successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_BACKGROUND_UPDATED));
+            return new ConversationResponsePrompt(
+                    successPrompt, MessageUtil.formatInfoMessage(Messages.MSG_BACKGROUND_UPDATED));
         }
     }
-    
 }

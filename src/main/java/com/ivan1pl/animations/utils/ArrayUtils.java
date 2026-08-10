@@ -12,10 +12,10 @@ import java.util.Arrays;
  * @author Eriol_Eandur
  */
 public class ArrayUtils {
-    
+
     public static String[] add(String[] array, String addition) {
-        String[] result = Arrays.copyOf(array, array.length+1);
-        result[result.length-1] = addition;
+        String[] result = Arrays.copyOf(array, array.length + 1);
+        result[result.length - 1] = addition;
         return result;
     }
 }
