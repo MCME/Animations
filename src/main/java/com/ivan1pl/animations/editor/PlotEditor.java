@@ -89,12 +89,14 @@ public final class PlotEditor {
 
     /** Closes the session and frees its lane. */
     public void exit(Player player) {
-        if (sessions.resume(player.getUniqueId()) == null) {
+        EditSession session = sessions.resume(player.getUniqueId());
+        if (session == null) {
             msg(player, "You're not editing.");
             return;
         }
+        cleanupSession(session);
         sessions.close(player.getUniqueId());
-        msg(player, "Left the plot editor.");
+        msg(player, "Left the plot editor. Plots cleared.");
     }
 
     private EditSession require(Player player) {
@@ -145,6 +147,34 @@ public final class PlotEditor {
             display.setBillboard(Display.Billboard.CENTER);
             display.addScoreboardTag("anim_plot_label");
         });
+    }
+
+    /**
+     * Clears a session's plots (floor + build region) and floating labels from the edit world.
+     * Clearing the region via {@code getBlockAt} loads each plot's chunk, which also makes the
+     * label removal reliable (the hologram sits in the same chunk column).
+     */
+    private void cleanupSession(EditSession session) {
+        World world = EditWorld.ensure(editWorldName);
+        for (int i = 1; i <= session.frames().size(); i++) {
+            PlotBounds b =
+                    geometry.frameBounds(session.laneIndex(), i, session.sizeX(), session.sizeY(), session.sizeZ());
+            for (int x = b.minX(); x <= b.maxX(); x++) {
+                for (int z = b.minZ(); z <= b.maxZ(); z++) {
+                    world.getBlockAt(x, b.minY() - 1, z).setType(Material.AIR, false);
+                    for (int y = b.minY(); y <= b.maxY(); y++) {
+                        world.getBlockAt(x, y, z).setType(Material.AIR, false);
+                    }
+                }
+            }
+            Location labelLoc = new Location(
+                    world, b.minX() + session.sizeX() / 2.0, b.maxY() + 2, b.minZ() + session.sizeZ() / 2.0);
+            world.getNearbyEntities(labelLoc, 1.5, 1.5, 1.5).forEach(entity -> {
+                if (entity.getScoreboardTags().contains("anim_plot_label")) {
+                    entity.remove();
+                }
+            });
+        }
     }
 
     private void msg(Player player, String text) {

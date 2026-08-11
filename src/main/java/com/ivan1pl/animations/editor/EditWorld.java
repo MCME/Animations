@@ -1,5 +1,6 @@
 package com.ivan1pl.animations.editor;
 
+import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -23,5 +24,40 @@ public final class EditWorld {
                 .generator(new VoidChunkGenerator())
                 .environment(World.Environment.NORMAL)
                 .createWorld();
+    }
+
+    /**
+     * Regenerates the edit world from scratch: unloads it (without saving), deletes its folder, and
+     * recreates it empty. Called on enable because editing sessions are in-memory only, so any plots
+     * left on disk from a previous run are stale scratch. Refuses a suspicious world name so it can
+     * never delete anything outside the world container.
+     */
+    public static World reset(String worldName) {
+        if (worldName == null
+                || worldName.isBlank()
+                || worldName.contains("/")
+                || worldName.contains("\\")
+                || worldName.contains("..")) {
+            return ensure(worldName);
+        }
+        World existing = Bukkit.getWorld(worldName);
+        if (existing != null) {
+            Bukkit.unloadWorld(existing, false);
+        }
+        File folder = new File(Bukkit.getWorldContainer(), worldName);
+        if (folder.isDirectory()) {
+            deleteRecursively(folder);
+        }
+        return ensure(worldName);
+    }
+
+    private static void deleteRecursively(File file) {
+        File[] children = file.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                deleteRecursively(child);
+            }
+        }
+        file.delete();
     }
 }

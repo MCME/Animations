@@ -47,11 +47,12 @@ public class AnimationsPlugin extends JavaPlugin {
         pluginInstance = this;
         this.saveDefaultConfig();
 
-        // Provision the private void world the plot-per-frame editor builds in. Fail-soft: if it
+        // Provision the private void world the plot-per-frame editor builds in, regenerating it from
+        // scratch: sessions are in-memory only, so any plots left on disk are stale. Fail-soft: if it
         // cannot be created the rest of the plugin still loads (audit M2/M3 posture).
         String editWorldName = getConfig().getString("editor.plot.world", "animations_edit");
         try {
-            World editWorld = EditWorld.ensure(editWorldName);
+            World editWorld = EditWorld.reset(editWorldName);
             if (editWorld == null) {
                 getLogger().warning("Plot editor: could not create edit world '" + editWorldName + "'.");
             } else {
