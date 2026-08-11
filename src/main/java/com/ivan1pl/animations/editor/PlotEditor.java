@@ -5,6 +5,7 @@ import com.ivan1pl.animations.data.AnimationsLocation;
 import com.ivan1pl.animations.data.Selection;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -53,6 +54,7 @@ public final class PlotEditor {
         EditSession session = sessions.open(player.getUniqueId(), name);
         session.setTarget(p1.getWorld().getName(), tx, ty, tz, sx, sy, sz);
         session.frames().add();
+        preparePlotForFrame(session, 1);
         msg(player, "Plot session '" + name + "' started (" + sx + "x" + sy + "x" + sz + "). Frame 1 ready.");
         teleportToFrame(player, session, 1);
     }
@@ -65,6 +67,7 @@ public final class PlotEditor {
         }
         session.frames().add();
         int n = session.frames().size();
+        preparePlotForFrame(session, n);
         msg(player, "Frame " + n + " added.");
         teleportToFrame(player, session, n);
     }
@@ -111,6 +114,24 @@ public final class PlotEditor {
                 player,
                 "Frame " + frameIndex + " plot @ " + b.minX() + "," + b.minY() + "," + b.minZ() + " (lane "
                         + session.laneIndex() + ").");
+    }
+
+    /**
+     * Lays a visible floor one block BELOW the plot (y = minY - 1, outside the captured region
+     * [minY..maxY]) so the builder can see the footprint and stand on it. The perimeter is a
+     * contrasting block so the plot edges read clearly.
+     */
+    private void preparePlotForFrame(EditSession session, int frameIndex) {
+        World world = EditWorld.ensure(editWorldName);
+        PlotBounds b = geometry.frameBounds(
+                session.laneIndex(), frameIndex, session.sizeX(), session.sizeY(), session.sizeZ());
+        int y = b.minY() - 1;
+        for (int x = b.minX(); x <= b.maxX(); x++) {
+            for (int z = b.minZ(); z <= b.maxZ(); z++) {
+                boolean border = x == b.minX() || x == b.maxX() || z == b.minZ() || z == b.maxZ();
+                world.getBlockAt(x, y, z).setType(border ? Material.POLISHED_ANDESITE : Material.SMOOTH_STONE, false);
+            }
+        }
     }
 
     private void msg(Player player, String text) {
