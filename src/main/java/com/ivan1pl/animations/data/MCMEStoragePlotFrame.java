@@ -177,11 +177,20 @@ public class MCMEStoragePlotFrame implements IFrame, IStoragePlot {
         }
     }
 
-    public void load(File file) {
+    /**
+     * Reads this frame's bytes from disk. Returns {@code false} (rather than swallowing the
+     * failure and leaving {@code frameNBTData} null, which later surfaced as a mystery NPE in
+     * {@link #show()} at playback) so the caller can skip a broken animation at load time — audit
+     * finding M3.
+     */
+    public boolean load(File file) {
         try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new FileInputStream(file)))) {
             frameNBTData = in.readAllBytes();
+            return true;
         } catch (IOException ex) {
-            Logger.getLogger(MCMEStoragePlotFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MCMEStoragePlotFrame.class.getName())
+                    .log(Level.SEVERE, "Failed to read frame file: " + file, ex);
+            return false;
         }
     }
 

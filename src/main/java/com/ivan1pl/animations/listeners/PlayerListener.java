@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 /**
@@ -75,5 +76,11 @@ public class PlayerListener implements Listener {
                 MessageUtil.sendInfoMessage(player, Messages.MSG_BLOCK_SELECTION_SET);
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        // Free the disconnecting player's wand selections so the maps don't grow forever (M7).
+        Animations.clearPlayerData(event.getPlayer().getUniqueId());
     }
 }

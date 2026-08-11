@@ -222,6 +222,17 @@ public class Animations {
         blockSelections.put(p.getUniqueId(), selection);
     }
 
+    /**
+     * Releases a player's transient wand selections. These maps are populated on demand and were
+     * never evicted, so they grew for the lifetime of the server; a quit handler drops the entry
+     * (audit finding M7). Selections are ephemeral scratch state, so losing them on disconnect is
+     * expected.
+     */
+    public static void clearPlayerData(UUID playerId) {
+        selections.remove(playerId);
+        blockSelections.remove(playerId);
+    }
+
     public static void reloadAnimation(String name) {
         File f = new File(new File(PLUGIN_DIR, name), "animation.yml");
         try {

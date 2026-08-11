@@ -117,13 +117,16 @@ public class MovingAnimation extends Animation {
         if (!folder.exists()) {
             folder.mkdir();
         }
+        // Attempt both reads (so each logs its own failure) but report failure if either could
+        // not be read, so the caller skips this animation instead of playing back a null (M3).
+        boolean ok = true;
         if (background instanceof MCMEStoragePlotFrame) {
-            ((MCMEStoragePlotFrame) background).load(new File(folder, "background.mcme"));
+            ok &= ((MCMEStoragePlotFrame) background).load(new File(folder, "background.mcme"));
         }
         if (frame instanceof MCMEStoragePlotFrame) {
-            ((MCMEStoragePlotFrame) frame).load(new File(folder, "frame.mcme"));
+            ok &= ((MCMEStoragePlotFrame) frame).load(new File(folder, "frame.mcme"));
         }
-        return true;
+        return ok;
     }
 
     public Selection getSelection() {

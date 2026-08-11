@@ -120,7 +120,11 @@ public class StationaryAnimation extends Animation {
         for (int i = 0; i < frames.size(); i++) {
             IFrame frame = frames.get(i);
             if (frame instanceof MCMEStoragePlotFrame) {
-                ((MCMEStoragePlotFrame) frame).load(new File(folder, "frame_" + i + ".mcme"));
+                // A frame that fails to read leaves the animation unusable; report it so the
+                // caller skips this animation instead of registering it to NPE at playback (M3).
+                if (!((MCMEStoragePlotFrame) frame).load(new File(folder, "frame_" + i + ".mcme"))) {
+                    return false;
+                }
             }
         }
         return true;
@@ -128,6 +132,21 @@ public class StationaryAnimation extends Animation {
 
     public Selection getSelection() {
         return selection;
+    }
+
+    /**
+     * Removes {@code frame_<keepCount>.mcme}, {@code frame_<keepCount+1>.mcme}, ... left behind by
+     * an earlier save that wrote more frames (audit finding M9). Frames are always written
+     * contiguously from index 0, so the sweep stops at the first index with no file on disk.
+     */
+    static void deleteOrphanFrames(File folder, int keepCount) {
+        for (int i = keepCount; ; i++) {
+            File orphan = new File(folder, "frame_" + i + ".mcme");
+            if (!orphan.exists()) {
+                break;
+            }
+            orphan.delete();
+        }
     }
 
     @Override
@@ -144,6 +163,9 @@ public class StationaryAnimation extends Animation {
                 ((MCMEStoragePlotFrame) frames.get(i)).save(new File(folder, "frame_" + i + ".mcme"));
             }
         }
+        // Drop any frame files from a previous save with more frames. Runs unconditionally so an
+        // animation trimmed to zero frames still has its files cleaned up (audit finding M9).
+        deleteOrphanFrames(folder, frames.size());
     }
 
     public static StationaryAnimation load(ConfigurationSection config) throws InvalidSelectionException {
