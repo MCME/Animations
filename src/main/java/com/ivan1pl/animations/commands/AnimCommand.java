@@ -84,6 +84,17 @@ public class AnimCommand {
                 // Phase 2 (plot editor): debug teleport into the private void edit world so it can be
                 // verified on the dev server. Will be superseded by session-aware commands.
                 .then(Commands.literal("editworld").executes(AnimCommand::teleportToEditWorld))
+                // Phase 2 (plot editor) session commands. Kept under a `plot` subtree during
+                // development so they don't disturb the existing conversation editor.
+                .then(Commands.literal("plot")
+                        .then(Commands.literal("create")
+                                .then(Commands.argument("name", StringArgumentType.word())
+                                        .executes(ctx -> plotCreate(ctx, StringArgumentType.getString(ctx, "name")))))
+                        .then(Commands.literal("new").executes(AnimCommand::plotNew))
+                        .then(Commands.literal("goto")
+                                .then(Commands.argument("frame", IntegerArgumentType.integer(1))
+                                        .executes(ctx -> plotGoto(ctx, IntegerArgumentType.getInteger(ctx, "frame")))))
+                        .then(Commands.literal("exit").executes(AnimCommand::plotExit)))
                 .then(AnimSoundCommand.subcommand());
     }
 
@@ -98,21 +109,65 @@ public class AnimCommand {
     }
 
     private static int teleportToEditWorld(CommandContext<CommandSourceStack> ctx) {
-        CommandSender sender = ctx.getSource().getSender();
-        if (!(sender instanceof Player player)) {
-            MessageUtil.sendErrorMessage(sender, Messages.MSG_PLAYER_ONLY);
+        Player player = playerOrNull(ctx);
+        if (player == null) {
             return 0;
         }
         String worldName =
                 AnimationsPlugin.getPluginInstance().getConfig().getString("editor.plot.world", "animations_edit");
         World world = EditWorld.ensure(worldName);
         if (world == null) {
-            sender.sendMessage(Component.text("Could not create edit world '" + worldName + "'."));
+            player.sendMessage(Component.text("Could not create edit world '" + worldName + "'."));
             return 0;
         }
         player.teleport(new Location(world, 0.5, 65, 0.5));
-        sender.sendMessage(Component.text("Teleported to edit world '" + worldName + "'."));
+        player.sendMessage(Component.text("Teleported to edit world '" + worldName + "'."));
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static int plotCreate(CommandContext<CommandSourceStack> ctx, String name) {
+        Player player = playerOrNull(ctx);
+        if (player == null) {
+            return 0;
+        }
+        AnimationsPlugin.getPluginInstance().getPlotEditor().create(player, name);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int plotNew(CommandContext<CommandSourceStack> ctx) {
+        Player player = playerOrNull(ctx);
+        if (player == null) {
+            return 0;
+        }
+        AnimationsPlugin.getPluginInstance().getPlotEditor().newFrame(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int plotGoto(CommandContext<CommandSourceStack> ctx, int frame) {
+        Player player = playerOrNull(ctx);
+        if (player == null) {
+            return 0;
+        }
+        AnimationsPlugin.getPluginInstance().getPlotEditor().gotoFrame(player, frame);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int plotExit(CommandContext<CommandSourceStack> ctx) {
+        Player player = playerOrNull(ctx);
+        if (player == null) {
+            return 0;
+        }
+        AnimationsPlugin.getPluginInstance().getPlotEditor().exit(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static Player playerOrNull(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        if (sender instanceof Player player) {
+            return player;
+        }
+        MessageUtil.sendErrorMessage(sender, Messages.MSG_PLAYER_ONLY);
+        return null;
     }
 
     private static int executeList(CommandSender sender, int page) {

@@ -30,6 +30,12 @@ editor:
     # Auto-created on enable if it does not exist.
     plot:
         world: animations_edit
+        # Spacing between editors' lanes (blocks on Z). Must exceed any animation's depth.
+        laneSpacing: 2048
+        # Gap (blocks on X) between frame plots within a lane.
+        frameGap: 8
+        # Y level the plots are built at.
+        baseY: 64
 
 ## Debugging options
 debug:

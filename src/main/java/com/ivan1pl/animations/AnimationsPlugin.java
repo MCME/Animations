@@ -23,6 +23,7 @@ import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.conversations.EditAnimationConversationFactory;
 import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.editor.EditWorld;
+import com.ivan1pl.animations.editor.PlotEditor;
 import com.ivan1pl.animations.listeners.PlayerListener;
 import com.ivan1pl.animations.triggers.RangeTriggerListener;
 import io.papermc.paper.command.brigadier.Commands;
@@ -39,6 +40,7 @@ public class AnimationsPlugin extends JavaPlugin {
 
     private static AnimationsPlugin pluginInstance;
     private EditAnimationConversationFactory conversationFactory;
+    private PlotEditor plotEditor;
 
     @Override
     public void onEnable() {
@@ -47,8 +49,8 @@ public class AnimationsPlugin extends JavaPlugin {
 
         // Provision the private void world the plot-per-frame editor builds in. Fail-soft: if it
         // cannot be created the rest of the plugin still loads (audit M2/M3 posture).
+        String editWorldName = getConfig().getString("editor.plot.world", "animations_edit");
         try {
-            String editWorldName = getConfig().getString("editor.plot.world", "animations_edit");
             World editWorld = EditWorld.ensure(editWorldName);
             if (editWorld == null) {
                 getLogger().warning("Plot editor: could not create edit world '" + editWorldName + "'.");
@@ -58,6 +60,11 @@ public class AnimationsPlugin extends JavaPlugin {
         } catch (Exception | LinkageError ex) {
             getLogger().log(Level.SEVERE, "Plot editor: failed to provision the edit world.", ex);
         }
+        plotEditor = new PlotEditor(
+                editWorldName,
+                getConfig().getInt("editor.plot.baseY", 64),
+                getConfig().getInt("editor.plot.laneSpacing", 2048),
+                getConfig().getInt("editor.plot.frameGap", 8));
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             final Commands registrar = commands.registrar();
@@ -83,5 +90,9 @@ public class AnimationsPlugin extends JavaPlugin {
 
     public EditAnimationConversationFactory getConversationFactory() {
         return conversationFactory;
+    }
+
+    public PlotEditor getPlotEditor() {
+        return plotEditor;
     }
 }
