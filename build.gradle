@@ -15,15 +15,15 @@ repositories {
     }
     mavenLocal()
     mavenCentral()
+    maven { url = "https://jitpack.io" }
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
-    // Provided at runtime by the separate PluginUtils plugin (see softdepend in plugin.yml),
-    // so it must NOT be shaded in. compileOnly keeps PluginUtils — and its transitive dynmap-api
-    // plus ~5 MB of stale org.bukkit 1.7.10 classes — out of the shadowJar. The pre-Gradle jar
-    // never bundled PluginUtils either.
-    compileOnly 'com.mcmiddleearth:PluginUtils:1.9.1'
+    compileOnly 'io.papermc.paper:paper-api:26.2.build.111-stable'
+    // Provided at runtime by the separate PluginUtils plugin (see depend in plugin.yml), so it
+    // must NOT be shaded in — compileOnly keeps it out of the shadowJar. Resolved from JitPack
+    // (com.github.MCME:PluginUtils), which ends the "install PluginUtils to mavenLocal first" step.
+    compileOnly 'com.github.MCME:PluginUtils:2.0.1'
 
     testImplementation platform('org.junit:junit-bom:6.0.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -32,10 +32,10 @@ dependencies {
     // reference; the tests exercise pure logic and never start a server. (A MockBukkit
     // server was tried but cannot construct the plot-storage frames: PluginUtils reads
     // Chunk#getTileEntities, which MockBukkit leaves unimplemented.)
-    testImplementation 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    testImplementation 'io.papermc.paper:paper-api:26.2.build.111-stable'
     // PluginUtils is compileOnly for the main source (not shaded); the tests still compile
     // against MCMEStoragePlotFrame (implements IStoragePlot), so it needs to be here too.
-    testImplementation 'com.mcmiddleearth:PluginUtils:1.9.1'
+    testImplementation 'com.github.MCME:PluginUtils:2.0.1'
 }
 
 // PluginUtils pulls in dynmap-api, which drags the ancient org.bukkit:bukkit:1.7.10.
@@ -49,7 +49,7 @@ configurations.testRuntimeClasspath {
 }
 
 // https://docs.gradle.org/current/dsl/org.gradle.api.plugins.JavaPluginExtension.html
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 java {
     toolchain {
         // Intellij should pick this up
@@ -80,7 +80,7 @@ test {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.4")
+        minecraftVersion("26.2")
     }
 }
 
