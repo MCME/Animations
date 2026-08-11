@@ -7,7 +7,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 
 /**
  * Ties per-player editing sessions to the void edit world: opens/closes sessions, adds frame plots,
@@ -132,6 +134,17 @@ public final class PlotEditor {
                 world.getBlockAt(x, y, z).setType(border ? Material.POLISHED_ANDESITE : Material.SMOOTH_STONE, false);
             }
         }
+
+        // Floating label above the plot so frames can be told apart. Tagged for later cleanup.
+        Location labelLoc =
+                new Location(world, b.minX() + session.sizeX() / 2.0, b.maxY() + 2, b.minZ() + session.sizeZ() / 2.0);
+        Component label =
+                Component.text(session.animationName()).appendNewline().append(Component.text("Frame " + frameIndex));
+        world.spawn(labelLoc, TextDisplay.class, display -> {
+            display.text(label);
+            display.setBillboard(Display.Billboard.CENTER);
+            display.addScoreboardTag("anim_plot_label");
+        });
     }
 
     private void msg(Player player, String text) {
