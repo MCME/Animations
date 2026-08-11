@@ -23,6 +23,7 @@ import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.constants.Permissions;
 import com.ivan1pl.animations.data.Animation;
 import com.ivan1pl.animations.data.Animations;
+import com.ivan1pl.animations.editor.EditWorld;
 import com.ivan1pl.animations.utils.MessageUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -32,7 +33,9 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -78,6 +81,9 @@ public class AnimCommand {
                         .then(Commands.argument("page", IntegerArgumentType.integer(1))
                                 .executes(ctx -> executeList(
                                         ctx.getSource().getSender(), IntegerArgumentType.getInteger(ctx, "page")))))
+                // Phase 2 (plot editor): debug teleport into the private void edit world so it can be
+                // verified on the dev server. Will be superseded by session-aware commands.
+                .then(Commands.literal("editworld").executes(AnimCommand::teleportToEditWorld))
                 .then(AnimSoundCommand.subcommand());
     }
 
@@ -88,6 +94,24 @@ public class AnimCommand {
             return 0;
         }
         AnimationsPlugin.getPluginInstance().getConversationFactory().startConversation(player, name);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int teleportToEditWorld(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        if (!(sender instanceof Player player)) {
+            MessageUtil.sendErrorMessage(sender, Messages.MSG_PLAYER_ONLY);
+            return 0;
+        }
+        String worldName =
+                AnimationsPlugin.getPluginInstance().getConfig().getString("editor.plot.world", "animations_edit");
+        World world = EditWorld.ensure(worldName);
+        if (world == null) {
+            sender.sendMessage(Component.text("Could not create edit world '" + worldName + "'."));
+            return 0;
+        }
+        player.teleport(new Location(world, 0.5, 65, 0.5));
+        sender.sendMessage(Component.text("Teleported to edit world '" + worldName + "'."));
         return Command.SINGLE_SUCCESS;
     }
 

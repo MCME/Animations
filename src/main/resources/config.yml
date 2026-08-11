@@ -26,6 +26,10 @@ editor:
     # the conversation. They will appear in public chat instead. Set to empty
     # string to disable escaping.
     escapeString: '!'
+    # Plot-per-frame editor (Animations 2.0): the private void world animations are built in.
+    # Auto-created on enable if it does not exist.
+    plot:
+        world: animations_edit
 
 ## Debugging options
 debug:

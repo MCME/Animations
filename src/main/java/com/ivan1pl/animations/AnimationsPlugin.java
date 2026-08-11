@@ -22,11 +22,13 @@ import com.ivan1pl.animations.commands.AnimCommand;
 import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.conversations.EditAnimationConversationFactory;
 import com.ivan1pl.animations.data.Animations;
+import com.ivan1pl.animations.editor.EditWorld;
 import com.ivan1pl.animations.listeners.PlayerListener;
 import com.ivan1pl.animations.triggers.RangeTriggerListener;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import java.util.logging.Level;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -42,6 +44,20 @@ public class AnimationsPlugin extends JavaPlugin {
     public void onEnable() {
         pluginInstance = this;
         this.saveDefaultConfig();
+
+        // Provision the private void world the plot-per-frame editor builds in. Fail-soft: if it
+        // cannot be created the rest of the plugin still loads (audit M2/M3 posture).
+        try {
+            String editWorldName = getConfig().getString("editor.plot.world", "animations_edit");
+            World editWorld = EditWorld.ensure(editWorldName);
+            if (editWorld == null) {
+                getLogger().warning("Plot editor: could not create edit world '" + editWorldName + "'.");
+            } else {
+                getLogger().info("Plot editor: edit world '" + editWorldName + "' ready.");
+            }
+        } catch (Exception | LinkageError ex) {
+            getLogger().log(Level.SEVERE, "Plot editor: failed to provision the edit world.", ex);
+        }
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             final Commands registrar = commands.registrar();
