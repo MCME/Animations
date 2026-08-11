@@ -42,4 +42,14 @@ public final class LaneGeometry {
     public int frameX(int frameIndex, int width) {
         return baseX + width + frameGap + (frameIndex - 1) * (width + frameGap);
     }
+
+    /** Block region of the reserved screen in the given lane, for a plot of the given size. */
+    public PlotBounds screenBounds(int laneIndex, int sizeX, int sizeY, int sizeZ) {
+        return new PlotBounds(screenX(), baseY, laneZ(laneIndex), sizeX, sizeY, sizeZ);
+    }
+
+    /** Block region of a builder-facing frame (1-based) in the given lane. */
+    public PlotBounds frameBounds(int laneIndex, int frameIndex, int sizeX, int sizeY, int sizeZ) {
+        return new PlotBounds(frameX(frameIndex, sizeX), baseY, laneZ(laneIndex), sizeX, sizeY, sizeZ);
+    }
 }
