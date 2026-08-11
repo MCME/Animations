@@ -23,7 +23,7 @@ dependencies {
     // Provided at runtime by the separate PluginUtils plugin (see depend in plugin.yml), so it
     // must NOT be shaded in — compileOnly keeps it out of the shadowJar. Resolved from JitPack
     // (com.github.MCME:PluginUtils), which ends the "install PluginUtils to mavenLocal first" step.
-    compileOnly 'com.github.MCME:PluginUtils:2.0.1'
+    compileOnly 'com.github.MCME:PluginUtils:2.0.2'
 
     testImplementation platform('org.junit:junit-bom:6.0.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -35,7 +35,7 @@ dependencies {
     testImplementation 'io.papermc.paper:paper-api:26.2.build.111-stable'
     // PluginUtils is compileOnly for the main source (not shaded); the tests still compile
     // against MCMEStoragePlotFrame (implements IStoragePlot), so it needs to be here too.
-    testImplementation 'com.github.MCME:PluginUtils:2.0.1'
+    testImplementation 'com.github.MCME:PluginUtils:2.0.2'
 }
 
 // PluginUtils pulls in dynmap-api, which drags the ancient org.bukkit:bukkit:1.7.10.
