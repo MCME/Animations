@@ -23,16 +23,20 @@ import java.util.HashSet;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  *
  * @author Ivan1pl
  */
 public abstract class BaseRangeTrigger extends BaseTrigger {
+
+    // Active range triggers. A single shared RangeTriggerListener dispatches player movement to
+    // these, instead of each trigger registering its own PlayerMoveEvent handler (audit finding M1).
+    private static final Set<BaseRangeTrigger> ACTIVE = new HashSet<>();
+
+    static Set<BaseRangeTrigger> active() {
+        return ACTIVE;
+    }
 
     private int range;
 
@@ -53,12 +57,14 @@ public abstract class BaseRangeTrigger extends BaseTrigger {
     @Override
     public void register() {
         init();
+        ACTIVE.add(this);
         super.register();
     }
 
     @Override
     public void unregister() {
         super.unregister();
+        ACTIVE.remove(this);
         playersInRange.clear();
     }
 
@@ -71,22 +77,14 @@ public abstract class BaseRangeTrigger extends BaseTrigger {
         }
     }
 
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player p = event.getPlayer();
-        handlePlayerMoved(p, isPlayerInRange(p));
+    /** Called by {@link RangeTriggerListener} for player move/join. */
+    void handleMove(Player player) {
+        handlePlayerMoved(player, isPlayerInRange(player));
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player p = event.getPlayer();
-        handlePlayerMoved(p, isPlayerInRange(p));
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player p = event.getPlayer();
-        handlePlayerMoved(p, false);
+    /** Called by {@link RangeTriggerListener} for player quit. */
+    void handleQuit(Player player) {
+        handlePlayerMoved(player, false);
     }
 
     private void handlePlayerMoved(Player player, boolean inRange) {

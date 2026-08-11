@@ -23,6 +23,7 @@ import com.ivan1pl.animations.constants.Messages;
 import com.ivan1pl.animations.conversations.EditAnimationConversationFactory;
 import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.listeners.PlayerListener;
+import com.ivan1pl.animations.triggers.RangeTriggerListener;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import java.util.logging.Level;
@@ -48,6 +49,7 @@ public class AnimationsPlugin extends JavaPlugin {
         });
 
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new RangeTriggerListener(), this);
 
         try {
             Animations.reload();
