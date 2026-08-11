@@ -25,6 +25,7 @@ import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.listeners.PlayerListener;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import java.util.logging.Level;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -48,7 +49,11 @@ public class AnimationsPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-        Animations.reload();
+        try {
+            Animations.reload();
+        } catch (Exception | LinkageError ex) {
+            getLogger().log(Level.SEVERE, "Failed to load animations; the plugin will run with none loaded.", ex);
+        }
         conversationFactory = new EditAnimationConversationFactory(this);
 
         getLogger().info(Messages.INFO_ENABLED);

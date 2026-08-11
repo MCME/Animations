@@ -56,10 +56,26 @@ public class Selection implements Serializable {
             return 0;
         }
 
-        int dx = Math.abs(point1.getBlockX() - point2.getBlockX()) + 1;
-        int dy = Math.abs(point1.getBlockY() - point2.getBlockY()) + 1;
-        int dz = Math.abs(point1.getBlockZ() - point2.getBlockZ()) + 1;
-        return dx * dy * dz;
+        return volumeOf(
+                point1.getBlockX(),
+                point1.getBlockY(),
+                point1.getBlockZ(),
+                point2.getBlockX(),
+                point2.getBlockY(),
+                point2.getBlockZ());
+    }
+
+    /**
+     * Block volume of the inclusive box between two corners. Computed in {@code long} and clamped to
+     * {@link Integer#MAX_VALUE} so a very large selection can't overflow to a negative {@code int}
+     * and slip past the {@code maxFrameSize} check (audit finding M5).
+     */
+    static int volumeOf(int x1, int y1, int z1, int x2, int y2, int z2) {
+        long dx = Math.abs((long) x1 - x2) + 1;
+        long dy = Math.abs((long) y1 - y2) + 1;
+        long dz = Math.abs((long) z1 - z2) + 1;
+        long volume = dx * dy * dz;
+        return volume > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) volume;
     }
 
     public void expand(int dx, int dy, int dz) {

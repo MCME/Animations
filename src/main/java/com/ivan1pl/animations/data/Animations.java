@@ -84,11 +84,11 @@ public class Animations {
         debugMode = AnimationsPlugin.getPluginInstance().getConfig().getBoolean("debug.enabled");
 
         String wand = AnimationsPlugin.getPluginInstance().getConfig().getString("wand");
-        wandMaterial = Material.valueOf(wand);
+        wandMaterial = parseMaterial(wand);
 
         String blockSelectorWand =
                 AnimationsPlugin.getPluginInstance().getConfig().getString("blockSelectorWand");
-        blockSelectorMaterial = Material.valueOf(blockSelectorWand);
+        blockSelectorMaterial = parseMaterial(blockSelectorWand);
 
         editorTimeout = AnimationsPlugin.getPluginInstance().getConfig().getInt("editor.timeout");
         editorEscapeString = AnimationsPlugin.getPluginInstance().getConfig().getString("editor.escapeString");
@@ -113,15 +113,25 @@ public class Animations {
                             Messages.INFO_INVALID_MATERIAL, blockSelectorWand, Material.BLAZE_ROD.toString()));
         }
 
+        // Stop anything still running before dropping the animations it refers to, otherwise
+        // orphaned tasks keep pasting frames for animations that no longer exist (audit finding M6).
+        for (AnimationTask task : new ArrayList<>(runningTasks)) {
+            task.stop();
+        }
+        runningTasks.clear();
+        currentSize = 0;
+
         animations.clear();
         for (Trigger t : triggers.values()) {
             t.unregister();
         }
         triggers.clear();
 
-        for (File f : PLUGIN_DIR.listFiles(File::isDirectory)) {
-            String name = f.getName();
-            reloadAnimation(name);
+        File[] animationDirs = PLUGIN_DIR.listFiles(File::isDirectory);
+        if (animationDirs != null) {
+            for (File f : animationDirs) {
+                reloadAnimation(f.getName());
+            }
         }
     }
 
@@ -247,8 +257,22 @@ public class Animations {
                 }
                 AnimationsPlugin.getPluginInstance().getLogger().info(Messages.INFO_ANIMATION_LOADED + name);
             }
-        } catch (Exception ex) {
-            Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception | LinkageError ex) {
+            // Isolate a single bad animation so it cannot disable the whole plugin. LinkageError is
+            // caught alongside Exception because a version-mismatched dependency surfaces as a
+            // NoSuchMethodError/NoClassDefFoundError (an Error, not an Exception) — audit finding M2.
+            Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, "Failed to load animation: " + name, ex);
+        }
+    }
+
+    private static Material parseMaterial(String name) {
+        if (name == null) {
+            return null;
+        }
+        try {
+            return Material.valueOf(name);
+        } catch (IllegalArgumentException ex) {
+            return null;
         }
     }
 
