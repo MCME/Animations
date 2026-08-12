@@ -40,21 +40,26 @@ public final class EditWorld {
                 || worldName.contains("..")) {
             return ensure(worldName);
         }
-        World existing = Bukkit.getWorld(worldName);
-        boolean wasLoaded = existing != null;
-        boolean unloaded = false;
-        if (existing != null) {
-            unloaded = Bukkit.unloadWorld(existing, false);
+        // Load (or create) the world first, then ask IT for its real folder — computing the path from
+        // getWorldContainer() + name is unreliable on custom/symlinked server layouts.
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            world = ensure(worldName);
         }
-        File folder = new File(Bukkit.getWorldContainer(), worldName);
+        if (world == null) {
+            Bukkit.getLogger().warning("[Animations] edit-world reset: could not open '" + worldName + "'.");
+            return null;
+        }
+        File folder = world.getWorldFolder();
+        boolean unloaded = Bukkit.unloadWorld(world, false);
         boolean existed = folder.isDirectory();
-        if (existed) {
+        if (unloaded && existed) {
             deleteRecursively(folder);
         }
         boolean deletedOk = existed && !folder.exists();
         Bukkit.getLogger()
-                .info("[Animations] edit-world reset: path=" + folder.getAbsolutePath() + " wasLoaded=" + wasLoaded
-                        + " unloaded=" + unloaded + " folderExisted=" + existed + " deletedOk=" + deletedOk);
+                .info("[Animations] edit-world reset: folder=" + folder.getAbsolutePath() + " unloaded=" + unloaded
+                        + " folderExisted=" + existed + " deletedOk=" + deletedOk);
         return ensure(worldName);
     }
 
