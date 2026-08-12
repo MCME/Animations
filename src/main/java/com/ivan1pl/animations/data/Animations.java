@@ -231,6 +231,25 @@ public class Animations {
         folder.delete();
     }
 
+    /** Names of all saved (but unpublished) drafts. */
+    public static List<String> listDrafts() {
+        List<String> names = new ArrayList<>();
+        File[] dirs = DRAFT_DIR.listFiles(File::isDirectory);
+        if (dirs != null) {
+            for (File dir : dirs) {
+                if (new File(dir, "animation.yml").isFile()) {
+                    names.add(dir.getName());
+                }
+            }
+        }
+        return names;
+    }
+
+    /** Loads a draft's metadata (selection + frame placeholders, no block data) for inspection. */
+    public static Animation loadDraft(String name) {
+        return AnimationFactory.loadAnimation(new File(new File(DRAFT_DIR, name), "animation.yml"));
+    }
+
     public static boolean deleteAnimation(String name) {
         File folder = new File(PLUGIN_DIR, name);
         boolean retval = new File(folder, "animation.yml").delete();

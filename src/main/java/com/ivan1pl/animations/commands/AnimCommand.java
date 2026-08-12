@@ -32,8 +32,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -77,10 +80,20 @@ public class AnimCommand {
                                     return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("list")
-                        .executes(ctx -> executeList(ctx.getSource().getSender(), 1))
+                        .executes(ctx -> executeList(ctx.getSource().getSender(), null, 1))
                         .then(Commands.argument("page", IntegerArgumentType.integer(1))
                                 .executes(ctx -> executeList(
-                                        ctx.getSource().getSender(), IntegerArgumentType.getInteger(ctx, "page")))))
+                                        ctx.getSource().getSender(),
+                                        null,
+                                        IntegerArgumentType.getInteger(ctx, "page"))))
+                        .then(Commands.argument("query", StringArgumentType.word())
+                                .executes(ctx -> executeList(
+                                        ctx.getSource().getSender(), StringArgumentType.getString(ctx, "query"), 1))
+                                .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                        .executes(ctx -> executeList(
+                                                ctx.getSource().getSender(),
+                                                StringArgumentType.getString(ctx, "query"),
+                                                IntegerArgumentType.getInteger(ctx, "page"))))))
                 // Phase 2 (plot editor): debug teleport into the private void edit world so it can be
                 // verified on the dev server. Will be superseded by session-aware commands.
                 .then(Commands.literal("editworld").executes(AnimCommand::teleportToEditWorld))
@@ -211,17 +224,55 @@ public class AnimCommand {
         return null;
     }
 
-    private static int executeList(CommandSender sender, int page) {
-        MessageUtil.sendInfoMessage(sender, Messages.MSG_DISPLAYING_PAGE, (long) page, (long) Animations.countPages());
-        List<String> list = Animations.getPage(page);
-        for (String item : list) {
-            Animation anim = Animations.getAnimation(item);
-            Location center = anim.getSelection().getCenter();
-            MessageUtil.sendInfoMessage(
-                    sender,
-                    Messages.MSG_ITEM,
-                    item + " (" + center.getX() + "," + center.getY() + "," + center.getZ() + ")");
+    private static int executeList(CommandSender sender, String query, int page) {
+        List<ListEntry> entries = new ArrayList<>();
+        for (String name : Animations.getAnimationNames()) {
+            entries.add(new ListEntry(name, true));
+        }
+        for (String name : Animations.listDrafts()) {
+            entries.add(new ListEntry(name, false));
+        }
+        if (query != null && !query.isEmpty()) {
+            String q = query.toLowerCase();
+            entries.removeIf(e -> !e.name().toLowerCase().contains(q));
+        }
+        entries.sort(Comparator.comparing(ListEntry::name));
+
+        int perPage = 10;
+        int total = entries.size();
+        int pages = Math.max(1, (total + perPage - 1) / perPage);
+        if (page < 1) {
+            page = 1;
+        }
+        if (page > pages) {
+            page = pages;
+        }
+
+        String header = "Animations - page " + page + "/" + pages + " (" + total + " total"
+                + (query == null || query.isEmpty() ? "" : ", matching '" + query + "'") + ")";
+        sender.sendMessage(Component.text(header, NamedTextColor.AQUA));
+        if (total == 0) {
+            sender.sendMessage(Component.text("None found.", NamedTextColor.GRAY));
+            return Command.SINGLE_SUCCESS;
+        }
+        int from = (page - 1) * perPage;
+        int to = Math.min(from + perPage, total);
+        for (int i = from; i < to; i++) {
+            ListEntry e = entries.get(i);
+            Animation anim = e.live() ? Animations.getAnimation(e.name()) : Animations.loadDraft(e.name());
+            String location = "?";
+            if (anim != null && anim.getSelection() != null) {
+                Location center = anim.getSelection().getCenter();
+                String world = center.getWorld() != null ? center.getWorld().getName() : "?";
+                location = world + " @ " + (int) center.getX() + "," + (int) center.getY() + "," + (int) center.getZ();
+            }
+            Component tag = e.live()
+                    ? Component.text("[LIVE] ", NamedTextColor.GREEN)
+                    : Component.text("[DRAFT] ", NamedTextColor.YELLOW);
+            sender.sendMessage(tag.append(Component.text(e.name() + " - " + location, NamedTextColor.GRAY)));
         }
         return Command.SINGLE_SUCCESS;
     }
+
+    private record ListEntry(String name, boolean live) {}
 }
