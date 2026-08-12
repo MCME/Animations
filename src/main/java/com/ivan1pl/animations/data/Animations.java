@@ -53,6 +53,11 @@ public class Animations {
     private static final File PLUGIN_DIR =
             new File(AnimationsPlugin.getPluginInstance().getDataFolder() + File.separator + "animations");
 
+    // Plot-editor work-in-progress. Not scanned by reload(), so drafts are neither listed nor live
+    // until published into PLUGIN_DIR.
+    private static final File DRAFT_DIR =
+            new File(AnimationsPlugin.getPluginInstance().getDataFolder() + File.separator + "animations_drafts");
+
     private static Material wandMaterial = null;
     private static Material blockSelectorMaterial = null;
 
@@ -75,6 +80,9 @@ public class Animations {
     static {
         if (!PLUGIN_DIR.exists()) {
             PLUGIN_DIR.mkdirs();
+        }
+        if (!DRAFT_DIR.exists()) {
+            DRAFT_DIR.mkdirs();
         }
     }
 
@@ -173,6 +181,54 @@ public class Animations {
             result = false;
         }
         return result;
+    }
+
+    /** Writes an animation to the drafts folder — persisted, but not loaded, listed, or playable. */
+    public static boolean saveDraft(String name, Animation animation) {
+        try {
+            File folder = new File(DRAFT_DIR, name);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+            File f = new File(folder, "animation.yml");
+            Files.deleteIfExists(f.toPath());
+            YamlConfiguration config = new YamlConfiguration();
+            animation.save(folder, config);
+            config.save(f);
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(Animations.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    public static boolean draftExists(String name) {
+        return new File(new File(DRAFT_DIR, name), "animation.yml").isFile();
+    }
+
+    /** Moves a draft into the live animations folder and registers it (makes it live at its target). */
+    public static OperationResult publishDraft(String name) {
+        File draftFolder = new File(DRAFT_DIR, name);
+        if (!new File(draftFolder, "animation.yml").isFile()) {
+            return OperationResult.NOT_FOUND;
+        }
+        File liveFolder = new File(PLUGIN_DIR, name);
+        deleteFolder(liveFolder);
+        if (!draftFolder.renameTo(liveFolder)) {
+            return OperationResult.INTERNAL_ERROR;
+        }
+        reloadAnimation(name);
+        return OperationResult.SUCCESS;
+    }
+
+    private static void deleteFolder(File folder) {
+        File[] children = folder.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                child.delete();
+            }
+        }
+        folder.delete();
     }
 
     public static boolean deleteAnimation(String name) {

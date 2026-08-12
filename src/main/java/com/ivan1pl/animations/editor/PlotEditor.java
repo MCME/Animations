@@ -119,21 +119,60 @@ public final class PlotEditor {
         msg(player, "Left the plot editor. Plots cleared.");
     }
 
-    /**
-     * Captures each plot's blocks into frame files stored at the session's real target location so
-     * the animation plays back where the wand selection was made (PLOT-EDITOR-DESIGN.md §7). A
-     * frame's paste position comes from the animation's selection, so building the animation over the
-     * target region and adding the plot-captured frames is all that is needed — no relocation.
-     */
+    /** Saves the current work as a hidden draft — persisted, but not listed, live, or at the target. */
     public void save(Player player) {
         EditSession session = require(player);
         if (session == null) {
             return;
         }
+        StationaryAnimation anim = captureAnimation(player, session);
+        if (anim == null) {
+            return;
+        }
+        if (Animations.saveDraft(session.animationName(), anim)) {
+            msg(
+                    player,
+                    "Saved draft '" + session.animationName() + "' ("
+                            + session.frames().size() + " frame(s)). /anim plot publish to place it at the target.");
+        } else {
+            msg(player, "Draft save failed.");
+        }
+    }
+
+    /** Commits the current work as a live animation at the real target location. */
+    public void publish(Player player) {
+        EditSession session = require(player);
+        if (session == null) {
+            return;
+        }
+        StationaryAnimation anim = captureAnimation(player, session);
+        if (anim == null) {
+            return;
+        }
+        Animations.saveDraft(session.animationName(), anim);
+        OperationResult result = Animations.publishDraft(session.animationName());
+        if (result == OperationResult.SUCCESS) {
+            msg(
+                    player,
+                    "Published '" + session.animationName() + "' to " + session.targetWorld() + " " + session.targetX()
+                            + "," + session.targetY() + "," + session.targetZ() + ". Play with /anim play "
+                            + session.animationName() + ".");
+        } else {
+            msg(player, "Publish failed: " + result + ".");
+        }
+    }
+
+    /**
+     * Builds a stationary animation from the session's plots, each frame captured from its plot, with
+     * the animation placed over the real target region (PLOT-EDITOR-DESIGN.md §7). A frame's paste
+     * position comes from the animation's selection, so no relocation is needed. Returns null (and
+     * messages the player) if the target world is unloaded or the selection is invalid.
+     */
+    private StationaryAnimation captureAnimation(Player player, EditSession session) {
         World targetWorld = Bukkit.getWorld(session.targetWorld());
         if (targetWorld == null) {
             msg(player, "Target world '" + session.targetWorld() + "' is not loaded.");
-            return;
+            return null;
         }
         World editWorld = EditWorld.ensure(editWorldName);
         Selection targetSel = new Selection();
@@ -156,19 +195,10 @@ public final class PlotEditor {
                 plotSel.setPoint2(new Location(editWorld, b.maxX(), b.maxY(), b.maxZ()));
                 anim.addFrame(MCMEStoragePlotFrame.fromSelection(plotSel));
             }
-            Animations.setAnimation(session.animationName(), anim);
-            OperationResult result = Animations.saveAnimation(session.animationName());
-            if (result == OperationResult.SUCCESS) {
-                Animations.reloadAnimation(session.animationName());
-                msg(
-                        player,
-                        "Saved '" + session.animationName() + "' (" + n + " frame(s)). Play it with /anim play "
-                                + session.animationName() + ".");
-            } else {
-                msg(player, "Save failed: " + result + ".");
-            }
+            return anim;
         } catch (InvalidSelectionException ex) {
             msg(player, "Could not build the animation (invalid selection).");
+            return null;
         }
     }
 
