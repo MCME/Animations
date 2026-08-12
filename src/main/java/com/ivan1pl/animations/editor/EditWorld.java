@@ -2,6 +2,8 @@ package com.ivan1pl.animations.editor;
 
 import java.io.File;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -20,10 +22,33 @@ public final class EditWorld {
         if (existing != null) {
             return existing;
         }
-        return new WorldCreator(worldName)
+        World world = new WorldCreator(worldName)
                 .generator(new VoidChunkGenerator())
                 .environment(World.Environment.NORMAL)
                 .createWorld();
+        if (world != null) {
+            configure(world);
+        }
+        return world;
+    }
+
+    /** Editing-friendly gamerules (frozen time/weather, no mobs) and a spawn landing platform. */
+    private static void configure(World world) {
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+        world.setGameRule(GameRule.MOB_GRIEFING, false);
+        world.setGameRule(GameRule.DO_FIRE_TICK, false);
+        world.setTime(6000); // fixed noon
+        world.setStorm(false);
+        world.setThundering(false);
+        // Small landing platform at spawn, well clear of the build lanes (which start at +X/+Z).
+        for (int x = -3; x <= 3; x++) {
+            for (int z = -19; z <= -13; z++) {
+                world.getBlockAt(x, 64, z).setType(Material.SMOOTH_STONE, false);
+            }
+        }
+        world.setSpawnLocation(0, 65, -16);
     }
 
     /**

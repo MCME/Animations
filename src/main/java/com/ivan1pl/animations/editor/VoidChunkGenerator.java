@@ -43,6 +43,7 @@ public class VoidChunkGenerator extends ChunkGenerator {
 
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
-        return new Location(world, 0, 65, 0);
+        // Clear of the build lanes, which start at the origin and grow +X / +Z.
+        return new Location(world, 0, 65, -16);
     }
 }

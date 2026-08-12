@@ -124,7 +124,7 @@ public class AnimCommand {
             player.sendMessage(Component.text("Could not create edit world '" + worldName + "'."));
             return 0;
         }
-        player.teleport(new Location(world, 0.5, 65, 0.5));
+        player.teleport(world.getSpawnLocation());
         player.sendMessage(Component.text("Teleported to edit world '" + worldName + "'."));
         return Command.SINGLE_SUCCESS;
     }
