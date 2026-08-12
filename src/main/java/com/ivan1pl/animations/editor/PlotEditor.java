@@ -62,7 +62,10 @@ public final class PlotEditor {
         session.setTarget(p1.getWorld().getName(), tx, ty, tz, sx, sy, sz);
         session.frames().add();
         preparePlotForFrame(session, 1);
-        msg(player, "Plot session '" + name + "' started (" + sx + "x" + sy + "x" + sz + "). Frame 1 ready.");
+        pasteInto(sel, session, 1);
+        msg(
+                player,
+                "Plot session '" + name + "' started (" + sx + "x" + sy + "x" + sz + "). Frame 1 = your selection.");
         teleportToFrame(player, session, 1);
     }
 
@@ -72,10 +75,12 @@ public final class PlotEditor {
         if (session == null) {
             return;
         }
+        int previous = session.frames().size();
         session.frames().add();
         int n = session.frames().size();
         preparePlotForFrame(session, n);
-        msg(player, "Frame " + n + " added.");
+        pasteInto(plotSelection(session, previous), session, n);
+        msg(player, "Frame " + n + " added (copied from frame " + previous + ").");
         teleportToFrame(player, session, n);
     }
 
@@ -166,6 +171,51 @@ public final class PlotEditor {
         }
     }
 
+    /** A selection over a frame's plot region in the edit world (used for copy-forward). */
+    private Selection plotSelection(EditSession session, int frameIndex) {
+        World world = EditWorld.ensure(editWorldName);
+        PlotBounds b = geometry.frameBounds(
+                session.laneIndex(), frameIndex, session.sizeX(), session.sizeY(), session.sizeZ());
+        loadChunks(world, b);
+        Selection sel = new Selection();
+        sel.setPoint1(new Location(world, b.minX(), b.minY(), b.minZ()));
+        sel.setPoint2(new Location(world, b.maxX(), b.maxY(), b.maxZ()));
+        return sel;
+    }
+
+    /** Copies the blocks of {@code source} into a frame's plot (the real selection, or a prior plot). */
+    private void pasteInto(Selection source, EditSession session, int frameIndex) {
+        if (!Selection.isValid(source)) {
+            return;
+        }
+        loadSelectionChunks(source);
+        World world = EditWorld.ensure(editWorldName);
+        PlotBounds dst = geometry.frameBounds(
+                session.laneIndex(), frameIndex, session.sizeX(), session.sizeY(), session.sizeZ());
+        loadChunks(world, dst);
+        MCMEStoragePlotFrame frame = MCMEStoragePlotFrame.fromSelection(source);
+        if (frame == null) {
+            return;
+        }
+        frame.relocate(editWorldName, dst.minX(), dst.minY(), dst.minZ());
+        frame.show();
+    }
+
+    private void loadSelectionChunks(Selection sel) {
+        AnimationsLocation p1 = sel.getPoint1();
+        AnimationsLocation p2 = sel.getPoint2();
+        World w = p1.getWorld();
+        int minX = Math.min(p1.getBlockX(), p2.getBlockX());
+        int maxX = Math.max(p1.getBlockX(), p2.getBlockX());
+        int minZ = Math.min(p1.getBlockZ(), p2.getBlockZ());
+        int maxZ = Math.max(p1.getBlockZ(), p2.getBlockZ());
+        for (int cx = minX >> 4; cx <= maxX >> 4; cx++) {
+            for (int cz = minZ >> 4; cz <= maxZ >> 4; cz++) {
+                w.getChunkAt(cx, cz);
+            }
+        }
+    }
+
     private EditSession require(Player player) {
         EditSession session = sessions.resume(player.getUniqueId());
         if (session == null) {
@@ -196,17 +246,28 @@ public final class PlotEditor {
         World world = EditWorld.ensure(editWorldName);
         PlotBounds b = geometry.frameBounds(
                 session.laneIndex(), frameIndex, session.sizeX(), session.sizeY(), session.sizeZ());
-        int y = b.minY() - 1;
+        loadChunks(world, b);
+        int floorY = b.minY() - 1;
+        // Clear any orphan blocks in the plot column, then lay a fresh floor (border contrasts).
         for (int x = b.minX(); x <= b.maxX(); x++) {
             for (int z = b.minZ(); z <= b.maxZ(); z++) {
+                for (int yy = floorY; yy <= b.maxY(); yy++) {
+                    world.getBlockAt(x, yy, z).setType(Material.AIR, false);
+                }
                 boolean border = x == b.minX() || x == b.maxX() || z == b.minZ() || z == b.maxZ();
-                world.getBlockAt(x, y, z).setType(border ? Material.POLISHED_ANDESITE : Material.SMOOTH_STONE, false);
+                world.getBlockAt(x, floorY, z)
+                        .setType(border ? Material.POLISHED_ANDESITE : Material.SMOOTH_STONE, false);
             }
         }
 
-        // Floating label above the plot so frames can be told apart. Tagged for later cleanup.
+        // (Re)place the floating label, removing any stale one already at this spot.
         Location labelLoc =
                 new Location(world, b.minX() + session.sizeX() / 2.0, b.maxY() + 2, b.minZ() + session.sizeZ() / 2.0);
+        world.getNearbyEntities(labelLoc, 1.5, 1.5, 1.5).forEach(entity -> {
+            if (entity.getScoreboardTags().contains("anim_plot_label")) {
+                entity.remove();
+            }
+        });
         Component label =
                 Component.text(session.animationName()).appendNewline().append(Component.text("Frame " + frameIndex));
         world.spawn(labelLoc, TextDisplay.class, display -> {

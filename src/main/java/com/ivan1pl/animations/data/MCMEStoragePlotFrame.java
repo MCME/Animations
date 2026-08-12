@@ -209,6 +209,18 @@ public class MCMEStoragePlotFrame implements IFrame, IStoragePlot {
         return new Location(Bukkit.getWorld(worldName), x + sizeX - 1, y + sizeY - 1, z + sizeZ - 1);
     }
 
+    /**
+     * Repoints this frame at a different world and low corner without touching its captured content
+     * (the block data is stored relative to the corner). Used to paste a captured region into a new
+     * location, e.g. a plot in the edit world (PLOT-EDITOR-DESIGN.md §7).
+     */
+    public void relocate(String worldName, int x, int y, int z) {
+        this.worldName = worldName;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     public static class StoragePlotSnapshotFaksimile extends StoragePlotSnapshot {
 
         private final BlockData[] blockData;
