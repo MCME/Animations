@@ -1,9 +1,14 @@
 package com.ivan1pl.animations.editor;
 
+import com.ivan1pl.animations.constants.OperationResult;
 import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.data.AnimationsLocation;
+import com.ivan1pl.animations.data.MCMEStoragePlotFrame;
 import com.ivan1pl.animations.data.Selection;
+import com.ivan1pl.animations.data.StationaryAnimation;
+import com.ivan1pl.animations.exceptions.InvalidSelectionException;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -97,6 +102,68 @@ public final class PlotEditor {
         cleanupSession(session);
         sessions.close(player.getUniqueId());
         msg(player, "Left the plot editor. Plots cleared.");
+    }
+
+    /**
+     * Captures each plot's blocks into frame files stored at the session's real target location so
+     * the animation plays back where the wand selection was made (PLOT-EDITOR-DESIGN.md §7). A
+     * frame's paste position comes from the animation's selection, so building the animation over the
+     * target region and adding the plot-captured frames is all that is needed — no relocation.
+     */
+    public void save(Player player) {
+        EditSession session = require(player);
+        if (session == null) {
+            return;
+        }
+        World targetWorld = Bukkit.getWorld(session.targetWorld());
+        if (targetWorld == null) {
+            msg(player, "Target world '" + session.targetWorld() + "' is not loaded.");
+            return;
+        }
+        World editWorld = EditWorld.ensure(editWorldName);
+        Selection targetSel = new Selection();
+        targetSel.setPoint1(new Location(targetWorld, session.targetX(), session.targetY(), session.targetZ()));
+        targetSel.setPoint2(new Location(
+                targetWorld,
+                session.targetX() + session.sizeX() - 1,
+                session.targetY() + session.sizeY() - 1,
+                session.targetZ() + session.sizeZ() - 1));
+        try {
+            StationaryAnimation anim = new StationaryAnimation(targetSel);
+            anim.setInterval(10);
+            int n = session.frames().size();
+            for (int i = 1; i <= n; i++) {
+                PlotBounds b =
+                        geometry.frameBounds(session.laneIndex(), i, session.sizeX(), session.sizeY(), session.sizeZ());
+                loadChunks(editWorld, b);
+                Selection plotSel = new Selection();
+                plotSel.setPoint1(new Location(editWorld, b.minX(), b.minY(), b.minZ()));
+                plotSel.setPoint2(new Location(editWorld, b.maxX(), b.maxY(), b.maxZ()));
+                anim.addFrame(MCMEStoragePlotFrame.fromSelection(plotSel));
+            }
+            Animations.setAnimation(session.animationName(), anim);
+            OperationResult result = Animations.saveAnimation(session.animationName());
+            if (result == OperationResult.SUCCESS) {
+                Animations.reloadAnimation(session.animationName());
+                msg(
+                        player,
+                        "Saved '" + session.animationName() + "' (" + n + " frame(s)). Play it with /anim play "
+                                + session.animationName() + ".");
+            } else {
+                msg(player, "Save failed: " + result + ".");
+            }
+        } catch (InvalidSelectionException ex) {
+            msg(player, "Could not build the animation (invalid selection).");
+        }
+    }
+
+    /** Force-loads the chunks a plot spans so capture reads real blocks even if the builder walked away. */
+    private void loadChunks(World world, PlotBounds b) {
+        for (int cx = b.minX() >> 4; cx <= b.maxX() >> 4; cx++) {
+            for (int cz = b.minZ() >> 4; cz <= b.maxZ() >> 4; cz++) {
+                world.getChunkAt(cx, cz);
+            }
+        }
     }
 
     private EditSession require(Player player) {

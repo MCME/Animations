@@ -48,6 +48,11 @@ public class StationaryAnimation extends Animation {
         frames.add(f);
     }
 
+    /** Appends a pre-built frame (used by the plot editor's capture path). */
+    public void addFrame(IFrame frame) {
+        frames.add(frame);
+    }
+
     public boolean removeFrame(int index) {
         if (index < 0 || index >= frames.size()) {
             return false;
