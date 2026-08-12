@@ -1,5 +1,6 @@
 package com.ivan1pl.animations.editor;
 
+import com.ivan1pl.animations.AnimationsPlugin;
 import com.ivan1pl.animations.constants.OperationResult;
 import com.ivan1pl.animations.data.Animations;
 import com.ivan1pl.animations.data.AnimationsLocation;
@@ -7,6 +8,11 @@ import com.ivan1pl.animations.data.MCMEStoragePlotFrame;
 import com.ivan1pl.animations.data.Selection;
 import com.ivan1pl.animations.data.StationaryAnimation;
 import com.ivan1pl.animations.exceptions.InvalidSelectionException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  * Ties per-player editing sessions to the void edit world: opens/closes sessions, adds frame plots,
@@ -28,6 +35,7 @@ public final class PlotEditor {
     private final SessionRegistry sessions = new SessionRegistry();
     private final LaneGeometry geometry;
     private final String editWorldName;
+    private final Map<UUID, BukkitTask> previewTasks = new HashMap<>();
 
     public PlotEditor(String editWorldName, int baseY, int laneSpacing, int frameGap) {
         this.editWorldName = editWorldName;
@@ -63,6 +71,7 @@ public final class PlotEditor {
         session.frames().add();
         preparePlotForFrame(session, 1);
         pasteInto(sel, session, 1);
+        prepareScreen(session);
         msg(
                 player,
                 "Plot session '" + name + "' started (" + sx + "x" + sy + "x" + sz + "). Frame 1 = your selection.");
@@ -104,6 +113,7 @@ public final class PlotEditor {
             msg(player, "You're not editing.");
             return;
         }
+        stopPreviewTask(player.getUniqueId());
         cleanupSession(session);
         sessions.close(player.getUniqueId());
         msg(player, "Left the plot editor. Plots cleared.");
@@ -243,12 +253,24 @@ public final class PlotEditor {
      * contrasting block so the plot edges read clearly.
      */
     private void preparePlotForFrame(EditSession session, int frameIndex) {
-        World world = EditWorld.ensure(editWorldName);
         PlotBounds b = geometry.frameBounds(
                 session.laneIndex(), frameIndex, session.sizeX(), session.sizeY(), session.sizeZ());
+        buildPlatform(
+                b,
+                Component.text(session.animationName()).appendNewline().append(Component.text("Frame " + frameIndex)));
+    }
+
+    /** Builds the reserved "screen" platform at the head of a session's lane (the local preview area). */
+    private void prepareScreen(EditSession session) {
+        PlotBounds b = geometry.screenBounds(session.laneIndex(), session.sizeX(), session.sizeY(), session.sizeZ());
+        buildPlatform(b, Component.text(session.animationName()).appendNewline().append(Component.text("SCREEN")));
+    }
+
+    /** Clears a plot column, lays a bordered floor one block below, and (re)places a floating label. */
+    private void buildPlatform(PlotBounds b, Component label) {
+        World world = EditWorld.ensure(editWorldName);
         loadChunks(world, b);
         int floorY = b.minY() - 1;
-        // Clear any orphan blocks in the plot column, then lay a fresh floor (border contrasts).
         for (int x = b.minX(); x <= b.maxX(); x++) {
             for (int z = b.minZ(); z <= b.maxZ(); z++) {
                 for (int yy = floorY; yy <= b.maxY(); yy++) {
@@ -259,17 +281,12 @@ public final class PlotEditor {
                         .setType(border ? Material.POLISHED_ANDESITE : Material.SMOOTH_STONE, false);
             }
         }
-
-        // (Re)place the floating label, removing any stale one already at this spot.
-        Location labelLoc =
-                new Location(world, b.minX() + session.sizeX() / 2.0, b.maxY() + 2, b.minZ() + session.sizeZ() / 2.0);
+        Location labelLoc = new Location(world, b.minX() + b.sizeX() / 2.0, b.maxY() + 2, b.minZ() + b.sizeZ() / 2.0);
         world.getNearbyEntities(labelLoc, 1.5, 1.5, 1.5).forEach(entity -> {
             if (entity.getScoreboardTags().contains("anim_plot_label")) {
                 entity.remove();
             }
         });
-        Component label =
-                Component.text(session.animationName()).appendNewline().append(Component.text("Frame " + frameIndex));
         world.spawn(labelLoc, TextDisplay.class, display -> {
             display.text(label);
             display.setBillboard(Display.Billboard.CENTER);
@@ -302,6 +319,88 @@ public final class PlotEditor {
                     entity.remove();
                 }
             });
+        }
+    }
+
+    /**
+     * Snapshots the current frames and loops them on the lane's screen so the animation can be
+     * validated in the void world before {@code /anim play} ever touches the real map. The snapshot
+     * is taken now; edit a plot and re-run {@code preview} to refresh it.
+     */
+    public void preview(Player player) {
+        EditSession session = require(player);
+        if (session == null) {
+            return;
+        }
+        int n = session.frames().size();
+        if (n == 0) {
+            msg(player, "Nothing to preview yet.");
+            return;
+        }
+        World editWorld = EditWorld.ensure(editWorldName);
+        PlotBounds screen =
+                geometry.screenBounds(session.laneIndex(), session.sizeX(), session.sizeY(), session.sizeZ());
+        List<MCMEStoragePlotFrame> frames = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            PlotBounds b =
+                    geometry.frameBounds(session.laneIndex(), i, session.sizeX(), session.sizeY(), session.sizeZ());
+            loadChunks(editWorld, b);
+            Selection plotSel = new Selection();
+            plotSel.setPoint1(new Location(editWorld, b.minX(), b.minY(), b.minZ()));
+            plotSel.setPoint2(new Location(editWorld, b.maxX(), b.maxY(), b.maxZ()));
+            MCMEStoragePlotFrame frame = MCMEStoragePlotFrame.fromSelection(plotSel);
+            if (frame != null) {
+                frame.relocate(editWorldName, screen.minX(), screen.minY(), screen.minZ());
+                frames.add(frame);
+            }
+        }
+        if (frames.isEmpty()) {
+            msg(player, "Nothing to preview.");
+            return;
+        }
+        loadChunks(editWorld, screen);
+        stopPreviewTask(player.getUniqueId());
+        int interval =
+                Math.max(1, AnimationsPlugin.getPluginInstance().getConfig().getInt("editor.plot.previewInterval", 10));
+        UUID id = player.getUniqueId();
+        int[] idx = {0};
+        BukkitTask task = Bukkit.getScheduler()
+                .runTaskTimer(
+                        AnimationsPlugin.getPluginInstance(),
+                        () -> {
+                            if (!player.isOnline()) {
+                                stopPreviewTask(id);
+                                return;
+                            }
+                            frames.get(idx[0]).show();
+                            idx[0] = (idx[0] + 1) % frames.size();
+                        },
+                        0L,
+                        interval);
+        previewTasks.put(id, task);
+        player.teleport(new Location(
+                editWorld, screen.minX() + screen.sizeX() / 2.0, screen.minY(), screen.minZ() + screen.sizeZ() / 2.0));
+        msg(player, "Previewing " + frames.size() + " frame(s) on the screen. /anim plot preview stop to stop.");
+    }
+
+    /** Stops a running preview and resets the screen. */
+    public void previewStop(Player player) {
+        if (previewTasks.get(player.getUniqueId()) == null) {
+            msg(player, "No preview running.");
+            return;
+        }
+        stopPreviewTask(player.getUniqueId());
+        EditSession session = sessions.resume(player.getUniqueId());
+        if (session != null) {
+            prepareScreen(session);
+        }
+        msg(player, "Preview stopped.");
+    }
+
+    private void stopPreviewTask(UUID player) {
+        BukkitTask task = previewTasks.remove(player);
+        if (task != null) {
+            task.cancel();
         }
     }
 

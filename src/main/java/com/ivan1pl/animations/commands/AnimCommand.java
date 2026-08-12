@@ -95,7 +95,10 @@ public class AnimCommand {
                                 .then(Commands.argument("frame", IntegerArgumentType.integer(1))
                                         .executes(ctx -> plotGoto(ctx, IntegerArgumentType.getInteger(ctx, "frame")))))
                         .then(Commands.literal("exit").executes(AnimCommand::plotExit))
-                        .then(Commands.literal("save").executes(AnimCommand::plotSave)))
+                        .then(Commands.literal("save").executes(AnimCommand::plotSave))
+                        .then(Commands.literal("preview")
+                                .executes(AnimCommand::plotPreview)
+                                .then(Commands.literal("stop").executes(AnimCommand::plotPreviewStop))))
                 .then(AnimSoundCommand.subcommand());
     }
 
@@ -168,6 +171,24 @@ public class AnimCommand {
             return 0;
         }
         AnimationsPlugin.getPluginInstance().getPlotEditor().save(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int plotPreview(CommandContext<CommandSourceStack> ctx) {
+        Player player = playerOrNull(ctx);
+        if (player == null) {
+            return 0;
+        }
+        AnimationsPlugin.getPluginInstance().getPlotEditor().preview(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int plotPreviewStop(CommandContext<CommandSourceStack> ctx) {
+        Player player = playerOrNull(ctx);
+        if (player == null) {
+            return 0;
+        }
+        AnimationsPlugin.getPluginInstance().getPlotEditor().previewStop(player);
         return Command.SINGLE_SUCCESS;
     }
 

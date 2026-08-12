@@ -36,6 +36,8 @@ editor:
         frameGap: 8
         # Y level the plots are built at.
         baseY: 64
+        # Ticks between frames when previewing on the screen.
+        previewInterval: 10
 
 ## Debugging options
 debug:
