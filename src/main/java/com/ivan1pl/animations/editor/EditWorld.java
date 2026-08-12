@@ -41,13 +41,20 @@ public final class EditWorld {
             return ensure(worldName);
         }
         World existing = Bukkit.getWorld(worldName);
+        boolean wasLoaded = existing != null;
+        boolean unloaded = false;
         if (existing != null) {
-            Bukkit.unloadWorld(existing, false);
+            unloaded = Bukkit.unloadWorld(existing, false);
         }
         File folder = new File(Bukkit.getWorldContainer(), worldName);
-        if (folder.isDirectory()) {
+        boolean existed = folder.isDirectory();
+        if (existed) {
             deleteRecursively(folder);
         }
+        boolean deletedOk = existed && !folder.exists();
+        Bukkit.getLogger()
+                .info("[Animations] edit-world reset: path=" + folder.getAbsolutePath() + " wasLoaded=" + wasLoaded
+                        + " unloaded=" + unloaded + " folderExisted=" + existed + " deletedOk=" + deletedOk);
         return ensure(worldName);
     }
 
